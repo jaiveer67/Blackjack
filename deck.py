@@ -10,4 +10,5 @@ class Deck:
         random.shuffle(self.cards);
 
     def draw_card(self):
-        return self.cards.pop
+        card = self.cards.pop()
+        return card

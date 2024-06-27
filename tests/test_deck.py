@@ -11,7 +11,7 @@ class TestDeck(unittest.TestCase):
         self.assertEqual(len(self.deck.cards), 52)
 
     def test_draw_card(self):
-        card = self.deck.draw_card
+        card = self.deck.draw_card()
         self.assertIsInstance(card, Card)
         self.assertEqual(len(self.deck.cards), 51)
 
