@@ -1,12 +1,13 @@
 ### Current (Improving terminal gameplay functionality)
 
 [ ] - Write more tests (mainly edge cases)
-[ ] - Give player option to play again
+[X] - Give player option to play again
 [ ] - Keep track of player wins and dealer wins 
-[ ] - Make it clear when a total value is soft/hard (Aces)
-[ ] - Allow player to see dealer's first card when choosing to hit/stand
+[ ] - Make it clear when a total value is soft (Aces)
+[X] - Allow player to see dealer's first card when choosing to hit/stand
 [ ] - Create option to double in addition to hit/stand
-[ ] - Dealer doesn't keep drawing cards after player busts
+[X] - Dealer doesn't keep drawing cards after player busts
+[ ] - Display all actions and display them on terminal one at a time to make it more realistic
 
 ### Future 
 

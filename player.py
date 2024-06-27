@@ -27,6 +27,9 @@ class Player:
     def str(self):
         return f"{self.name}: {self.hand} (Value: {self.hand_value()})"
     
+    def wants_to_play_again(self):
+        return input("Do you want to play again? (y/n) ").lower() == 'y'
+    
 class Dealer(Player):
         def should_draw(self):
             return self.hand_value() < 17

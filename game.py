@@ -13,7 +13,8 @@ class Game:
         self.deck.shuffle()
         self.deal_initial_cards()
         self.player_turn()
-        self.dealer_turn()
+        if not self.player.is_bust():
+            self.dealer_turn()
         self.show_results()
 
     def deal_initial_cards(self):
@@ -23,6 +24,7 @@ class Game:
         self.dealer.add_card(self.deck.draw_card())
 
     def player_turn(self):
+        print(f"\n{self.dealer.name}'s hand: [{self.dealer.hand[0]}, ?]")
         while not self.player.is_bust() and self.player.wants_to_hit():
             self.player.add_card(self.deck.draw_card())
 
