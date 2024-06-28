@@ -2,14 +2,21 @@
 from deck import Deck
 from player import Player, Dealer
 
+player_wins = 0
+dealer_wins = 0
+draws = 0
+
 class Game:
     def __init__(self):
         self.deck = Deck()
         self.player = Player("Player")
         self.dealer = Dealer("Dealer")
+        self.player_wins = player_wins
+        self.dealer_wins = dealer_wins
+        self.draws = draws
 
     def start(self):
-        print("Welcome to my Blackjack game!")
+        print("\nWelcome to my Blackjack game!")
         self.deck.shuffle()
         self.deal_initial_cards()
         self.player_turn()
@@ -38,11 +45,26 @@ class Game:
         print("Dealer's hand:", self.dealer.hand, "Value =", self.dealer.hand_value())
         if self.player.is_bust():
             print("You bust! Dealer wins.")
+            self.update_score(2)
         elif self.dealer.is_bust():
             print("Dealer busts! You win.")
+            self.update_score(1)
         elif self.player.hand_value() > self.dealer.hand_value():
             print("You win!")
+            self.update_score(1)
         elif self.player.hand_value() < self.dealer.hand_value():
             print("Dealer wins.")
+            self.update_score(2)
         else:
             print("It's a push!")
+            self.update_score(3)
+
+    def update_score(self, num):
+        global player_wins, dealer_wins, draws
+        if num == 1:
+            player_wins+=1
+        elif num == 2:
+            dealer_wins+=1
+        else:
+            draws+=1
+        print("\nYour wins:", player_wins, "\nDealer's wins:", dealer_wins, "\nDraws:", draws)
