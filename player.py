@@ -16,6 +16,11 @@ class Player:
             ace_count -= 1
         return value
     
+    def has_blackjack(self):
+        if self.hand_value() == 21:
+            print("\nBLACKJACK!")
+            return True
+    
     def is_bust(self):
         return self.hand_value() > 21
     

@@ -1,8 +1,8 @@
 ### Current (Improving terminal gameplay functionality)
 
 [ ] - Write more tests (mainly edge cases)
-[ ] - Create function to deal with player blackjack (currently still gives player option to hit)
-[ ] - Fix player being asked to hit on 21
+[X] - Create function to deal with player blackjack (currently still gives player option to hit)
+[X] - Fix player being asked to hit on 21
 [X] - Give player option to play again
 [X] - Keep track of player wins and dealer wins 
 [ ] - Make it clear when a total value is soft (Aces)
