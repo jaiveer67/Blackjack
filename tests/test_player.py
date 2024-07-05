@@ -15,5 +15,9 @@ class TestPlayer(unittest.TestCase):
         self.player.hand = [Card('8', 'Spades'), Card('K', 'Clubs'), Card('4', 'Diamonds')]
         self.assertTrue(self.player.is_bust())
 
+    def test_has_blackjack(self):
+        self.player.hand = [Card('A', 'Spades'), Card('K', 'Clubs')]
+        self.assertTrue(self.player.has_blackjack())
+
 if __name__ == '__main__':
     unittest.main()
