@@ -1,6 +1,5 @@
 # Main game logic
 from deck import Deck
-from card import Card
 from player import Player, Dealer
 
 player_wins = 0
@@ -19,29 +18,25 @@ class Game:
     def start(self):
         print("\nWelcome to my Blackjack game!")
         self.deck.shuffle()
+        self.player.reset_hand()
+        self.dealer.reset_hand()
         self.deal_initial_cards()
-        if not self.player.has_blackjack():
-            self.player_turn()
-        if not self.player.is_bust():
-            self.dealer_turn()
-        self.show_results()
+        # if not self.player.has_blackjack():
+        #     self.player_turn()
+        # if not self.player.is_bust():
+        #     self.dealer_turn()
+        # self.show_results()
 
     def deal_initial_cards(self):
-        card1 = Card("7", "Spades")
-        card2 = Card("7", "Clubs")
-        self.player.add_card(card1)
-        self.player.add_card(card2)
-
-        # self.player.add_card(self.deck.draw_card())
+        self.player.add_card(self.deck.draw_card())
         self.dealer.add_card(self.deck.draw_card())
-        # self.player.add_card(self.deck.draw_card())
+        self.player.add_card(self.deck.draw_card())
         self.dealer.add_card(self.deck.draw_card())
 
     def player_turn(self):
         print(f"\n{self.dealer.name}'s hand: [{self.dealer.hand[0]}, ?]")
         while not self.player.is_bust() and not self.player.hand_value() == 21 and self.player.wants_to_hit():
-            self.player.add_card(Card("7", "Diamonds"))
-            #self.player.add_card(self.deck.draw_card())
+            self.player.add_card(self.deck.draw_card())
 
     def dealer_turn(self):
         while self.dealer.should_draw():
@@ -76,3 +71,9 @@ class Game:
         else:
             draws+=1
         print("\nYour wins:", player_wins, "\nDealer's wins:", dealer_wins, "\nDraws:", draws)
+
+    def player_hand(self):
+        return [{'suit': card.suit, 'value': card.value} for card in self.player.hand]
+    
+    def dealer_hand(self):
+        return [{'suit': card.suit, 'value': card.value} for card in self.dealer.hand]
