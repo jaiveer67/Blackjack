@@ -5,17 +5,16 @@
 [X] - Fix player being asked to hit on 21
 [X] - Give player option to play again
 [X] - Keep track of player wins and dealer wins 
-[ ] - Make it clear when a total value is soft (Aces)
 [X] - Allow player to see dealer's first card when choosing to hit/stand
 [ ] - Create option to double in addition to hit/stand
 [X] - Dealer doesn't keep drawing cards after player busts
-[ ] - Display all actions and display them on terminal one at a time to make it more realistic
-[ ] - Change it so it only says "Welcome to my blackjack game" on the first round
+[X] - Develop a front end for the game
+[ ] - Make front end more visually appealing
+[ ] - Add split option
 
 ### Future 
-
-[ ] - Develop a front end for the game (GUI)
-[ ] - Add split option
+[ ] - Add basic strategy help button
+[ ] - Add menu
 [ ] - Add surrender option
 [ ] - Add money so player is actually wagering instead of just counting wins/losses
 [ ] - Create option for player to take insurance when dealer shows an Ace
@@ -23,3 +22,4 @@
 [ ] - Include game instructions and rules
 [ ] - Create side bets
 [ ] - Add sounds for different actions
+[ ] - Use more decks (currently uses 1 I think)

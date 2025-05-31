@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Hand from './Hand';
 import Controls from './Controls';
 import './App.css';
@@ -67,17 +67,20 @@ const handlePlayAgain = () => {
 };
 
   return (
+  <div className="App"> {
   <div>
     <h1>Blackjack</h1>
 
     {!gameStarted && (
-      <button onClick={startGame}>Start Game</button>
+      <div className="start-button-container">
+    <button onClick={startGame}>Start Game</button>
+    </div>
     )}
 
     {gameStarted && (
       <>
         <div>
-          <h2>Player's Hand ({playerValue})</h2>
+          <h2>Your Hand ({playerValue})</h2>
           <Hand cards={playerHand} />
         </div>
 
@@ -101,13 +104,16 @@ const handlePlayAgain = () => {
         <Controls
           onHit={handleHit}
           onStand={handleStand}
-          onPlayAgain={handlePlayAgain}
         />
       )}
       {gameOver && (
+        <div className="play-again-button-container">
         <button onClick={handlePlayAgain}>Play Again</button>
+        </div>
       )}
     </div>
+  </div>
+}
   </div>
 );
 }

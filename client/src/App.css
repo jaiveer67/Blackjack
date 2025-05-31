@@ -1,49 +1,66 @@
 .App {
+  height: 100vh; /* full screen height */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* or center */
+}
+
+.hand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 10px;
+}
+
+.card {
+  width: 100px;
+  padding: 10px;
+  margin-left: 10px;
+  margin-right: 10px;
+}
+
+.card img {
+  width: 100px;
+  display: block;
+  height: auto;
+}
+
+.controls {
+  justify-content: center ;
+  display: flex;
+  gap: 20px;
+  margin-top: 20px; 
+}
+
+button {
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 10px 20px;
+  font-size: 32px;
+}
+
+h1 {
   text-align: center;
+  font-size: 5rem;
 }
 
-.hand {
+h2 {
+  margin-left: 10rem;   /* move right */
+  margin-top: 2rem;    /* move down */
+  font-size: 2rem;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+.start-button-container {
   display: flex;
-  justify-content: center;
-  margin: 10px 0;
+  justify-content: center; 
 }
 
-.card {
-  border: 1px solid #000;
-  padding: 10px;
-  margin: 0 5px;
-  font-size: 18px;
-}
-
-.controls {
-  margin: 20px;
-}
-
-button {
-  margin: 5px;
-  padding: 10px 20px;
-  font-size: 16px;
-}
-
-.hand {
+.play-again-button-container {
   display: flex;
-  justify-content: center;
-  margin: 10px 0;
-}
-
-.card {
-  border: 1px solid #000;
-  padding: 10px;
-  margin: 0 5px;
-  font-size: 18px;
-}
-
-.controls {
-  margin: 20px;
-}
-
-button {
-  margin: 5px;
-  padding: 10px 20px;
-  font-size: 16px;
+  justify-content: center; 
 }
