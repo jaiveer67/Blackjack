@@ -5,6 +5,7 @@ from player import Player, Dealer
 player_wins = 0
 dealer_wins = 0
 draws = 0
+hit = False
 
 class Game:
     def __init__(self):
@@ -14,13 +15,15 @@ class Game:
         self.player_wins = player_wins
         self.dealer_wins = dealer_wins
         self.draws = draws
-
-    def start(self):
-        print("\nWelcome to my Blackjack game!")
+        self.hit = hit
         self.deck.shuffle()
         self.player.reset_hand()
         self.dealer.reset_hand()
         self.deal_initial_cards()
+
+    def start(self):
+        print("\nWelcome to my Blackjack game!")
+        self.__init__()
         # if not self.player.has_blackjack():
         #     self.player_turn()
         # if not self.player.is_bust():
@@ -34,9 +37,13 @@ class Game:
         self.dealer.add_card(self.deck.draw_card())
 
     def player_turn(self):
+        self.hit = True
         print(f"\n{self.dealer.name}'s hand: [{self.dealer.hand[0]}, ?]")
-        while not self.player.is_bust() and not self.player.hand_value() == 21 and self.player.wants_to_hit():
+        if not self.player.is_bust() and self.hit == True:
             self.player.add_card(self.deck.draw_card())
+            self.hit = False
+        if self.player.hand_value() == 21:
+            self.dealer_turn()
 
     def dealer_turn(self):
         while self.dealer.should_draw():
@@ -73,7 +80,7 @@ class Game:
         print("\nYour wins:", player_wins, "\nDealer's wins:", dealer_wins, "\nDraws:", draws)
 
     def player_hand(self):
-        return [{'suit': card.suit, 'value': card.value} for card in self.player.hand]
+        return [{'suit': card.suit, 'rank': card.rank} for card in self.player.hand]
     
     def dealer_hand(self):
-        return [{'suit': card.suit, 'value': card.value} for card in self.dealer.hand]
+        return [{'suit': card.suit, 'rank': card.rank} for card in self.dealer.hand]

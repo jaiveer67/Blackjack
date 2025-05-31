@@ -27,7 +27,7 @@ class Player:
     def wants_to_hit(self):
         print(f"\n{self.name}'s hand: {self.hand}")
         print(f"Total value: {self.hand_value()}")
-        return input("Do you want to hit? (y/n) ").lower() == 'y'
+        #return input("Do you want to hit? (y/n) ").lower() == 'y'
     
     def wants_to_double(self):
         print(f"\n{self.name}'s hand: {self.hand}")

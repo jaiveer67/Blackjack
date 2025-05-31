@@ -36,3 +36,26 @@
     transform: rotate(360deg);
   }
 }
+
+.hand {
+  display: flex;
+  justify-content: center;
+  margin: 10px 0;
+}
+
+.card {
+  border: 1px solid #000;
+  padding: 10px;
+  margin: 0 5px;
+  font-size: 18px;
+}
+
+.controls {
+  margin: 20px;
+}
+
+button {
+  margin: 5px;
+  padding: 10px 20px;
+  font-size: 16px;
+}

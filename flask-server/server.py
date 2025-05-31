@@ -7,17 +7,31 @@ game = Game()
 
 @app.route("/start", methods=["GET"])
 def start():
-    try:
-        game.start()
-        return jsonify({
-            'player_hand': game.player_hand(),
-            'dealer_hand': game.dealer_hand(),
-            'player_value': game.player.hand_value(),
-            'dealer_value': game.dealer.hand_value(),
-    }) 
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    game.start()
+    return jsonify({
+        'playerHand': game.player_hand(),
+        'dealerHand': game.dealer_hand(),
+        'playerValue': game.player.hand_value(),
+        'dealerValue': game.dealer.hand[0].value,
+    })
 
+@app.route("/hit", methods=['GET'])
+def hit():
+    game.player_turn()
+    return jsonify({
+        'playerHand': game.player_hand(),
+        'gameOver': game.player.is_bust(),
+        'playerValue': game.player.hand_value(),
+    })
+
+@app.route("/stand", methods=['GET'])
+def stand():
+    game.dealer_turn()
+    return jsonify({
+        'dealerHand': game.dealer_hand(),
+        'dealerValue': game.dealer.hand_value(),
+        'gameOver': True
+    }) 
 
 if __name__ == "__main__":
     app.run(debug=True)
