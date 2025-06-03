@@ -1,8 +1,20 @@
 .App {
-  height: 100vh; /* full screen height */
+  height: 100vh;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* or center */
+  justify-content: space-between;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+h1 {
+  text-align: center;
+  font-size: 5rem;
+  margin-bottom: -20px;
 }
 
 .hand {
@@ -14,53 +26,113 @@
 .card {
   width: 100px;
   padding: 10px;
-  margin-left: 10px;
-  margin-right: 10px;
+  margin: 0 10px;
 }
 
 .card img {
   width: 100px;
-  display: block;
   height: auto;
+  display: block;
 }
 
 .controls {
-  justify-content: center ;
   display: flex;
+  justify-content: center;
   gap: 20px;
-  margin-top: 20px; 
+  margin-top: 20px;
+  margin-bottom: 50px;
 }
 
 button {
-  margin-left: 10px;
-  margin-right: 10px;
   padding: 10px 20px;
   font-size: 32px;
-}
-
-h1 {
-  text-align: center;
-  font-size: 5rem;
-}
-
-h2 {
-  margin-left: 10rem;   /* move right */
-  margin-top: 2rem;    /* move down */
-  font-size: 2rem;
-}
-
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
+  margin: 0 10px;
 }
 
 .start-button-container {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
+  margin-bottom: 200px;
 }
 
 .play-again-button-container {
   display: flex;
-  justify-content: center; 
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+  margin-bottom: 50px;
+}
+
+.hands-container {
+  display: flex;
+  gap: 40px;
+  justify-content: center;
+}
+
+.hand-wrapper {
+  text-align: center;
+  gap: 100px;
+}
+
+.result-message-wrapper {
+  height: 2.5em; /* or however tall your message is */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.result-message {
+  text-align: center;
+  font-weight: bold;
+  font-size: 2.5em;
+  margin-bottom: 30px;
+}
+
+.centered-result-message {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  font-size: 2em;
+  text-align: center;
+}
+
+.dealer-section {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.hand-row {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
+}
+
+.hand-label-and-cards {
+  display: flex;
+  align-items: center;      /* vertically align label and cards */
+  gap: 20px;                /* space between label and cards */
+}
+
+.hand-label {
+  font-size: 1.5rem;
+  font-weight: bold;
+  white-space: nowrap;
+  min-width: 50px;
+  text-align: right;
+}
+
+.hands-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.split-hands {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
 }
