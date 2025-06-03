@@ -16,6 +16,7 @@
 [ ] - Add basic strategy help button
 [ ] - Add menu
 [ ] - Add surrender option
+[ ] - Add insurance option
 [ ] - Add money so player is actually wagering instead of just counting wins/losses
 [ ] - Create option for player to take insurance when dealer shows an Ace
 [ ] - Incorporate the ability to play multiple hands at once

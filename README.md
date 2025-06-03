@@ -1,4 +1,4 @@
-# 🃏 Simple Blackjack Game
+# 🃏 Blackjack Game
 
 ## 🎮 Introduction
 
