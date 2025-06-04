@@ -13,25 +13,60 @@ class Game:
         self.player = Player("Player")
         self.split_player = None
         self.dealer = Dealer("Dealer")
-        self.player_wins = player_wins
-        self.dealer_wins = dealer_wins
-        self.draws = draws
-        self.hit = hit
+        self.player_money = 3000  # set default
+        self.current_bet = 0
+        self._initialize_game()
+
+    def _initialize_game(self):
         self.deck.shuffle()
         self.player.reset_hand()
         self.dealer.reset_hand()
         self.deal_initial_cards()
 
-    def start(self):
-        print("\nWelcome to my Blackjack game!")
-        self.__init__()
-        if self.player.hand_value() == 21:
-            self.dealer_turn()
-        # if not self.player.has_blackjack():
-        #     self.player_turn()
-        # if not self.player.is_bust():
-        #     self.dealer_turn()
-        # self.show_results()
+    def reset_round(self):
+        self.split_player = None
+        self.deck = Deck()
+        self.deck.shuffle()
+        self.player.reset_hand()
+        self.dealer.reset_hand()
+        self.deal_initial_cards()
+        self.current_bet = 0
+
+    def place_bet(self, amount):
+        if amount <= 0 or amount > self.player.money:
+            raise ValueError("Invalid bet amount")
+        self.player.place_bet(amount)
+        self.currentBet = amount
+
+    def handle_payout(self):
+        if self.split_player:
+            for hand_player in [self.player, self.split_player]:
+                self._resolve_hand(hand_player)
+        else:
+            self._resolve_hand(self.player)
+
+    def _resolve_hand(self, player):
+        if player.is_bust():
+            player.lose_bet()
+        elif self.dealer.is_bust() or player.hand_value() > self.dealer.hand_value():
+            if player.has_blackjack():
+                player.win_bet(2.5)
+            else:
+                player.win_bet()
+        elif player.hand_value() == self.dealer.hand_value():
+            player.push_bet()
+        else:
+            player.lose_bet()
+
+    # def start(self):
+    #     preserved_money = self.player.money
+    #     preserved_bet = self.player.current_bet
+    #     self.__init__()
+    #     self.player.money = preserved_money
+    #     self.player.current_bet = preserved_bet
+    #     self.currentBet = preserved_bet
+    #     if self.player.hand_value() == 21:
+    #         self.dealer_turn()
 
     def deal_initial_cards(self):
         self.player.add_card(self.deck.draw_card())

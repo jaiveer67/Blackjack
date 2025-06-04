@@ -11,6 +11,17 @@
 [X] - Add split option
 [ ] - Add money so player is actually wagering instead of just counting wins/losses
 [X] - Add music/sound effects (could add some more though)
+[ ] - Create target amount for the player to get to (win condition)
+[ ] - Create bankrupcy (lose condition)
+[ ] - Add double
+[ ] - Automatically reset bet amount to previous bet
+[ ] - change buttons to chips 
+
+check player 21(not blackjack) vs dealer blackjack and make sure it is not a push
+random large increases in money (maybe has to do with blackjacks)
+split funcionality not working properly with money (both in terms of doubling your bet and also showing win when actually is loss)
+need to add a way to do full reset, right now only way is to close and rerun
+
 
 
 ### Future 

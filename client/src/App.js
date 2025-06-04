@@ -16,6 +16,10 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [resultMessages, setResultMessages] = useState([]);
+  const [bettingPhase, setBettingPhase] = useState(false);
+  const [currentBet, setCurrentBet] = useState(0);
+  const [playerMoney, setPlayerMoney] = useState(3000);
+  const chipValues = [1, 10, 25, 50, 100];
 
   const audioRef = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -48,28 +52,46 @@ useEffect(() => {
 
   const toggleMute = () => setIsMuted(prev => !prev);
 
-const startGame = () => {
-    console.log("Fetching")
-    fetch("/start")
-      .then(response => response.json())
-      .then(data => {
-        setPlayerHand1(data.playerHand);
-        setDealerHand(data.dealerHand);
-        setPlayerValue1(data.playerValue);
-        setDealerValue(data.dealerValue);
-        setGameStarted(true);
-        setActiveHand(1);
-        setGameOver(data.gameOver);
-        if (data.result) {
-        setResultMessages(data.result || []);
-      }
-        if (data.gameOver) {
-      handleGameOver();
-    }
-        console.log(data)
-        console.log(playerHand1)
-      });
-    }
+const handleChipClick = (amount) => {
+  if (playerMoney >= currentBet + amount) {
+    setCurrentBet(prev => prev + amount);
+  }
+};
+
+const handleClearBet = () => {
+  setCurrentBet(0);
+};
+
+const handleDeal = () => {
+  if (currentBet <= 0 || currentBet > playerMoney) {
+    alert("Place a valid bet");
+    return;
+  }
+
+  fetch(`/bet/${currentBet}`, { method: "POST" })
+    .then(res => {
+      if (!res.ok) throw new Error("Invalid bet");
+      return res.json();
+    })
+    .then(() => {
+      return fetch("/start");
+    })
+    .then(res => res.json())
+    .then(data => {
+      setPlayerHand1(data.playerHand);
+      setDealerHand(data.dealerHand);
+      setPlayerValue1(data.playerValue);
+      setDealerValue(data.dealerValue);
+      setResultMessages(data.result || []);
+      setGameOver(data.gameOver);
+      setPlayerMoney(data.playerMoney);
+      setActiveHand(1);
+      setBettingPhase(false);   // Exit betting
+      setGameStarted(true);     // Show game UI
+      setCurrentBet(data.currentBet)
+      if (data.gameOver) handleGameOver();
+    })
+};
 
 const handleHit = () => {
     playSound(cardSound);
@@ -110,6 +132,7 @@ const handleHit = () => {
           setDealerValue(data.dealerValue);
           setGameOver(true);
           setResultMessages(data.results || []);
+          setPlayerMoney(data.playerMoney);
         });
     }
   } else {
@@ -120,6 +143,7 @@ const handleHit = () => {
         setDealerValue(data.dealerValue);
         setGameOver(true);
         setResultMessages(data.results || []);
+        setPlayerMoney(data.playerMoney);
       });
   }
 };
@@ -145,7 +169,9 @@ const handlePlayAgain = () => {
       setResultMessages([]);
       setPlayerHand2([]);
       setPlayerValue2(0);
-      startGame();
+      setCurrentBet(0);
+      setBettingPhase(true);  // Go back to betting screen
+      setGameStarted(false); 
     });
 };
 
@@ -158,6 +184,23 @@ const handleGameOver = () => {
       playSound(blackjackSound);
       setResultMessages(data.results || [])
     });
+};
+
+const handleReset = () => {
+  setGameOver(true);
+  fetch("/reset", { method: "POST" })
+      .then(res => res.json())
+      .then(() => {
+        setPlayerMoney(3000);
+        setCurrentBet(0);
+        setPlayerHand1([]);
+        setPlayerHand2([]);
+        setDealerHand([]);
+        setGameStarted(false);
+        setGameOver(false);
+        setResultMessages([]);
+        setBettingPhase(true);  // move to betting screen
+      });
 };
 
 const getCardValue = (card) => {
@@ -175,13 +218,39 @@ const playSound = (sound) => {
 
 return (
   <div className="App">
-    <h1>BlackJack</h1>
+  <h1>Blackjack</h1>
 
-    {!gameStarted && (
-      <div className="start-button-container">
-        <button onClick={startGame}>Start Game</button>
+  {!gameStarted && !bettingPhase && (
+    <div className="start-button-container">
+      <button
+  onClick={handleReset}
+>
+  Start Game
+</button>
+    </div>
+  )}
+
+  {bettingPhase && !gameStarted && (
+    <div className="betting-section">
+      <h2>Your Money: ${playerMoney - currentBet}</h2>
+      <h2>Current Bet: ${currentBet}</h2>
+      <div className="chip-container">
+        {chipValues.map((value) => (
+          <button key={value} onClick={() => handleChipClick(value)}>
+            ${value}
+          </button>
+        ))}
+        <button onClick={handleClearBet}>Clear</button>
       </div>
-    )}
+      <button 
+        onClick={handleDeal} 
+        disabled={currentBet === 0}
+        className="deal-button"
+      >
+        Deal
+      </button>
+    </div>
+  )}
 
     <div className ="mute-button-container">
     <button onClick={toggleMute}>
