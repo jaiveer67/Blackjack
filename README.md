@@ -17,6 +17,7 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 - 👇 Interactive controls for:
   - **Hit** – take another card
   - **Stand** – end your turn and let the dealer play
+  - **Split** - split your hand into 2 if you have a pair
   - **Play Again** – reset and start a new round
 - ♠️ ♥️ **Card visuals** for both player and dealer hands
 - 🔄 **Stateful gameplay** with automatic bust detection

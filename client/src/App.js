@@ -1,7 +1,9 @@
-import React, { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Hand from './Hand';
-import Controls from './Controls';
 import './App.css';
+import cardSound from './assets/sounds/card_deal.mp3'
+import backgroundMusic from './assets/sounds/casino_music.mp3'
+import blackjackSound from './assets/sounds/blackjack.mp3'
 
 function App() {
   const [playerHand1, setPlayerHand1] = useState([]);
@@ -14,6 +16,37 @@ function App() {
   const [gameStarted, setGameStarted] = useState(false);
   const [gameOver, setGameOver] = useState(false);
   const [resultMessages, setResultMessages] = useState([]);
+
+  const audioRef = useRef(null);
+  const [isMuted, setIsMuted] = useState(false);
+
+useEffect(() => {
+    if (!audioRef.current) {
+      const music = new Audio(backgroundMusic);
+      music.loop = true;
+      music.volume = 0.2;
+      music.muted = isMuted;
+      audioRef.current = music;
+    }
+
+    if (gameStarted) {
+      audioRef.current.play().catch(err => {
+        console.warn("Autoplay blocked:", err);
+      });
+    }
+
+    return () => {
+      audioRef.current?.pause();
+    };
+  }, [gameStarted]);
+
+  useEffect(() => {
+    if (audioRef.current) {
+      audioRef.current.muted = isMuted;
+    }
+  }, [isMuted]);
+
+  const toggleMute = () => setIsMuted(prev => !prev);
 
 const startGame = () => {
     console.log("Fetching")
@@ -30,12 +63,16 @@ const startGame = () => {
         if (data.result) {
         setResultMessages(data.result || []);
       }
+        if (data.gameOver) {
+      handleGameOver();
+    }
         console.log(data)
         console.log(playerHand1)
       });
     }
 
 const handleHit = () => {
+    playSound(cardSound);
     const endpoint = activeHand === 1 ? "/hit/1" : "/hit/2";
     fetch(endpoint)
       .then(response => response.json())
@@ -112,6 +149,18 @@ const handlePlayAgain = () => {
     });
 };
 
+const handleGameOver = () => {
+  setGameOver(true);
+  fetch("/gameOver")
+    .then(response => response.json())
+    .then(data => {
+      setGameOver(false);
+      setDealerValue(data.dealerValue);
+      playSound(blackjackSound);
+      handleStand();
+    });
+};
+
 const getCardValue = (card) => {
   const valueMap = {
     '2': 2, '3': 3, '4': 4, '5': 5,
@@ -121,12 +170,9 @@ const getCardValue = (card) => {
   return valueMap[card?.rank] ?? 0;
 };
 
-const dealerHandOrHidden = gameOver
-  ? dealerHand
-  : dealerHand.length > 0
-    ? [dealerHand[0], { faceDown: true }]
-    : [];
-
+const playSound = (sound) => {
+  new Audio(sound).play();
+};
 
 return (
   <div className="App">
@@ -138,6 +184,11 @@ return (
       </div>
     )}
 
+    <div className ="mute-button-container">
+    <button onClick={toggleMute}>
+        {isMuted ? 'Unmute' : 'Mute'}
+      </button>
+</div>
     {gameStarted && (
       <>
         <div className="hands-section">
@@ -218,8 +269,5 @@ return (
     )}
   </div>
 );
-
-
-
 }
 export default App;

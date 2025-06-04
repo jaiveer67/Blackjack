@@ -111,5 +111,11 @@ def split():
         'playerValue2': game.player2_value()
     }) 
 
+@app.route("/gameOver", methods=['GET'])
+def gameOver():
+    return jsonify({
+        'dealerValue': game.dealer.hand_value()
+    }) 
+
 if __name__ == "__main__":
     app.run(debug=True)
