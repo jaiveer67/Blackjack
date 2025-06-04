@@ -154,10 +154,9 @@ const handleGameOver = () => {
   fetch("/gameOver")
     .then(response => response.json())
     .then(data => {
-      setGameOver(false);
       setDealerValue(data.dealerValue);
       playSound(blackjackSound);
-      handleStand();
+      setResultMessages(data.results || [])
     });
 };
 

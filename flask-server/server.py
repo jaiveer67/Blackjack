@@ -113,8 +113,10 @@ def split():
 
 @app.route("/gameOver", methods=['GET'])
 def gameOver():
+    results = ["BLACKJACK! YOU WIN!"]
     return jsonify({
-        'dealerValue': game.dealer.hand_value()
+        'dealerValue': game.dealer.hand_value(),
+        'results': results
     }) 
 
 if __name__ == "__main__":
