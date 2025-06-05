@@ -1,9 +1,11 @@
 # Player and Dealer classes
 
 class Player:
-    def __init__(self, name):
+    def __init__(self, name, starting_money=3000):
         self.name = name
         self.hand = []
+        self.money = starting_money
+        self.current_bet = 0
 
     def add_card(self, card):
         self.hand.append(card)
@@ -42,6 +44,23 @@ class Player:
     
     def reset_hand(self):
         self.hand = []
+
+    def place_bet(self, amount):
+        if amount > self.money:
+            raise ValueError("Bet exceeds available money.")
+        self.current_bet = amount
+        self.money -= amount
+
+    def win_bet(self, multiplier=2):
+        self.money += self.current_bet * multiplier
+        self.current_bet = 0
+
+    def push_bet(self):
+        self.money += self.current_bet
+        self.current_bet = 0
+
+    def lose_bet(self):
+        self.current_bet = 0
     
 class Dealer(Player):
         def should_draw(self):
