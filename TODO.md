@@ -16,10 +16,15 @@
 [X] - Automatically reset bet amount to previous bet, unless player money is < previous amount
 [ ] - Change buttons to chips 
 [ ] - Make sure display is consistent across platforms and devices
+[ ] - Add card animations / have only one card revealed at a time
+[ ] - Include help button with game instructions and rules
+[ ] - Total money in corner and wagered amount in middle
+[X] - End music on bankrupt
+[ ] - If you bet larger amount than you have it automatically puts rest of your money into the bet
+[ ] - Swap player hand to bottom and dealer hand to top
 
 
 ### Future 
-[ ] - Add card animations / have only one card revealed at a time
 [ ] - Add basic strategy help button
 [ ] - Add more to summary (total hands, hands lost, hands pushed, largest hand won/lost, etc)
 [ ] - Add menu
@@ -27,10 +32,10 @@
 [ ] - Add insurance option
 [ ] - Create option for player to take insurance when dealer shows an Ace
 [ ] - Incorporate the ability to play multiple hands at once
-[ ] - Include game instructions and rules
 [ ] - Create side bets
 [ ] - Use more decks (currently uses 1 I think)
 [ ] - Add saving/loading
 [ ] - Add highscore tracking
 [ ] - Create settings where player can change things such as # of decks used, if dealer hits on soft 17, etc.
 [ ] - Clean up code (indentations, refactoring, variable naming, unused functions, etc.)
+[ ] - Maybe create hand limit?

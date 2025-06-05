@@ -4,6 +4,7 @@ import './App.css';
 import cardSound from './assets/sounds/card_deal.mp3'
 import backgroundMusic from './assets/sounds/casino_music.mp3'
 import blackjackSound from './assets/sounds/blackjack.mp3'
+import logo from './assets/images/home_screen.png'
 
 function App() {
   const [playerHand1, setPlayerHand1] = useState([]);
@@ -18,12 +19,15 @@ function App() {
   const [resultMessages, setResultMessages] = useState([]);
   const [bettingPhase, setBettingPhase] = useState(false);
   const [currentBet, setCurrentBet] = useState(0);
-  const [playerMoney, setPlayerMoney] = useState(3000);
+  const [playerMoney, setPlayerMoney] = useState(2000);
   const [showSummary, setShowSummary] = useState(false);
   const [cashOutSummary, setCashOutSummary] = useState(null);
   const [isBankrupt, setIsBankrupt] = useState(false);
-  const chipValues = [1, 10, 25, 50, 100, 500];
+  const [cardsDealt, setCardsDealt] = useState(false);
+  const [lastBet, setLastBet] = useState(0);
+  const [isSplit, setIsSplit] = useState(false);
 
+  const chipValues = [1, 10, 25, 50, 100, 500];
   const audioRef = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
 
@@ -55,7 +59,10 @@ const toggleMute = () => setIsMuted(prev => !prev);
 
 const handleChipClick = (amount) => {
   if (playerMoney >= currentBet + amount) {
-    setCurrentBet(prev => prev + amount);
+    setCurrentBet(prev => {
+      const newBet = prev + amount;
+      return newBet;
+    });
   }
 };
 
@@ -69,6 +76,8 @@ const handleDeal = () => {
     return;
   }
 
+  setLastBet(currentBet);
+
   fetch(`/bet/${currentBet}`, { method: "POST" })
     .then(res => {
       if (!res.ok) throw new Error("Invalid bet");
@@ -79,20 +88,49 @@ const handleDeal = () => {
     })
     .then(res => res.json())
     .then(data => {
-      setPlayerHand1(data.playerHand);
-      setDealerHand(data.dealerHand);
-      setPlayerValue1(data.playerValue);
-      setDealerValue(data.dealerValue);
-      setResultMessages(data.result || []);
-      setGameOver(data.gameOver);
-      setPlayerMoney(data.playerMoney);
-      setActiveHand(1);
-      setBettingPhase(false);   // Exit betting
-      setGameStarted(true);     // Show game UI
-      if (data.gameOver) {
-        handleGameOver()
-      }
-    })
+  setPlayerMoney(data.playerMoney);
+  setGameStarted(true);
+  const playerCards = data.playerHand;
+  const dealerCards = data.dealerHand;
+      
+  setPlayerHand1([]);
+  setDealerHand([]);
+  
+  // Deal cards one by one
+  setTimeout(() => {
+  setPlayerHand1([playerCards[0]]);
+  playSound(cardSound);
+}, 600);
+
+setTimeout(() => {
+  setDealerHand([dealerCards[0]]);
+  playSound(cardSound);
+}, 1200);
+
+setTimeout(() => {
+  setPlayerHand1([playerCards[0], playerCards[1]]);
+  playSound(cardSound);
+}, 1800);
+
+setTimeout(() => {
+  setDealerHand([dealerCards[0], dealerCards[1]]);
+  playSound(cardSound);
+}, 2400); 
+
+setTimeout(() => {
+  setCardsDealt(true);
+}, 3000);
+
+  setTimeout(() => {
+    setPlayerValue1(data.playerValue);
+    setDealerValue(data.dealerValue);
+    setResultMessages(data.result || []);
+    setGameOver(data.gameOver);
+    setActiveHand(1);
+    setBettingPhase(false);
+    if (data.gameOver) handleGameOver();
+    }, 3100);
+})
 };
 
 const handleHit = () => {
@@ -130,6 +168,7 @@ const handleHit = () => {
       fetch("/stand")
         .then(response => response.json())
         .then(data => {
+          
           setDealerHand(data.dealerHand);
           setDealerValue(data.dealerValue);
           setGameOver(true);
@@ -137,6 +176,7 @@ const handleHit = () => {
           setPlayerMoney(data.playerMoney);
           if (data.playerMoney <= 0) {
             setIsBankrupt(true);
+            setIsMuted(true);
             setCashOutSummary(data);
             setShowSummary(true);
             }
@@ -153,6 +193,7 @@ const handleHit = () => {
         setPlayerMoney(data.playerMoney);
         if (data.playerMoney <= 0) {
             setIsBankrupt(true);
+            setIsMuted(true);
             handleCashOut();
             }
       });
@@ -160,6 +201,7 @@ const handleHit = () => {
 };
 
 const handleDouble = () => {
+  setCurrentBet(2*currentBet);
   fetch("/double", { method: "POST" })
     .then(res => res.json())
     .then(data => {
@@ -177,6 +219,7 @@ const handleDouble = () => {
 };
 
 const handleSplit = () => {
+  setIsSplit(true);
   fetch("/split")
     .then(response => response.json())
     .then(data => {
@@ -194,12 +237,17 @@ const handlePlayAgain = () => {
     .then(response => response.json())
     .then(data => {
       setGameOver(false);
+      setCardsDealt(false);
+      setIsSplit(false);
+      setDealerValue(0);
+      setPlayerValue1(0);
       setResultMessages([]);
       setPlayerHand2([]);
       setPlayerValue2(0);
       setCurrentBet(data.currentBet);
       setBettingPhase(true);  // Go back to betting screen
       setGameStarted(false); 
+      handleClearBet();
     });
 };
 
@@ -219,7 +267,7 @@ const handleReset = () => {
   fetch("/reset", { method: "POST" })
       .then(res => res.json())
       .then(() => {
-        setPlayerMoney(3000);
+        setPlayerMoney(2000);
         setCurrentBet(0);
         setPlayerHand1([]);
         setPlayerHand2([]);
@@ -250,7 +298,8 @@ const getCardValue = (card) => {
 };
 
 const playSound = (sound) => {
-  new Audio(sound).play();
+  const audio = new Audio(sound);
+  audio.play();
 };
 
 return (
@@ -259,6 +308,7 @@ return (
 
   {!gameStarted && !bettingPhase && (
     <div className="start-button-container">
+      <img src={logo} alt="Blackjack Logo" className="start-logo" />
       <button
   onClick={handleReset}
 >
@@ -286,6 +336,17 @@ return (
       >
         Deal
       </button>
+      <button
+    onClick={() => {
+      if (lastBet > 0 && lastBet <= playerMoney) {
+        setCurrentBet(lastBet);
+      }
+    }}
+    disabled={lastBet <= 0 || lastBet > playerMoney}
+    className="deal-button"
+  >
+    Rebet
+  </button>
       <div className="cashout-button-container">
     <button onClick={handleCashOut}>Cash Out</button>
   </div>
@@ -308,13 +369,20 @@ return (
             <div className="split-hands">
              <div className="hand-wrapper">
   <div className="result-message-wrapper">
-    {gameOver && resultMessages.length > 0 && (
-      <div className="result-message">{resultMessages[0]}</div>
-    )}
+    <div className="result-message" style={{ visibility: gameOver ? 'visible' : 'hidden' }}>
+  {resultMessages[0] || ""}
+</div>
   </div>
   <div className="hand-row">
-    <div className="hand-label">Hand 1 ({playerValue1}) {activeHand === 1 && "(Active)"}</div>
+    <div className="hand-label">
+  {cardsDealt ? `Hand 1 (${playerValue1})` : <span style={{ visibility: "hidden" }}>Hand 1 (00)</span>}
+</div>
+
+
     <Hand cards={playerHand1} />
+  </div>
+  <div className="current-bet-display">
+    Bet: ${currentBet}
   </div>
 </div>
 
@@ -325,8 +393,14 @@ return (
     )}
   </div>
   <div className="hand-row">
-    <div className="hand-label">Hand 2 ({playerValue2}) {activeHand === 2 && "(Active)"}</div>
+    <div className="hand-label">
+  {cardsDealt ? `Hand 2 (${playerValue2})` : <span style={{ visibility: "hidden" }}>Hand 2 (00)</span>}
+</div>
+
     <Hand cards={playerHand2} />
+  </div>
+  <div className="current-bet-display">
+    Bet: ${currentBet}
   </div>
 </div>
             </div>
@@ -338,23 +412,33 @@ return (
     )}
   </div>
   <div className="hand-row">
-    <div className="hand-label">Your Hand ({playerValue1})</div>
+  <div className="hand-label">
+  {cardsDealt ? `Your Hand (${playerValue1})` : <span style={{ visibility: "hidden" }}>Your Hand (00)</span>}
+</div>
     <Hand cards={playerHand1} />
   </div>
 </div>
           )}
         </div>
-
+        {gameStarted && cardsDealt && !isSplit && (
+  <div className="current-bet-display">
+    Bet: ${currentBet}
+  </div>
+)}
         <div className="dealer-section">
           <div className="hand-row">
-            <div className="hand-label">Dealer's Hand ({dealerValue})</div>
+  <div className="hand-label" style={{ visibility: cardsDealt ? 'visible' : 'hidden' }}>
+    Dealer's Hand ({dealerValue})
+  </div>
             <Hand
               cards={
                 gameOver
                   ? dealerHand
-                  : dealerHand.length > 0
-                    ? [dealerHand[0], { faceDown: true }]
-                    : []
+                  : dealerHand.length === 1
+                    ? [dealerHand[0]]
+                    : dealerHand.length === 2
+                      ? [dealerHand[0], { faceDown: true }]
+                      : []
               }
             />
           </div>
@@ -362,20 +446,30 @@ return (
       </>
     )}
 
-    {!gameOver && gameStarted && (
-  <div className="controls">
-    <button onClick={handleHit}>Hit</button>
-    <button onClick={handleStand}>Stand</button>
-    <button onClick={handleDouble}
-    disabled={playerMoney < currentBet}
-    >Double</button>
-    {playerHand1.length === 2 &&
-      getCardValue(playerHand1[0]) === getCardValue(playerHand1[1]) &&
-      playerValue2 === 0 && (
-        <button onClick={handleSplit}>Split</button>
-      )}
-  </div>
-)}
+    <div
+  className="controls"
+  style={{ visibility: !gameOver && gameStarted && cardsDealt ? 'visible' : 'hidden' }}
+>
+  <button onClick={handleHit}>Hit</button>
+  <button onClick={handleStand}>Stand</button>
+  <button
+  disabled={playerMoney < currentBet}
+    onClick={handleDouble}
+  >
+    Double
+  </button>
+  <button
+    onClick={handleSplit}
+    disabled={
+      playerHand1.length !== 2 ||
+      getCardValue(playerHand1[0]) !== getCardValue(playerHand1[1]) ||
+      playerValue2 !== 0 ||
+      playerMoney < currentBet
+    }
+  >
+    Split
+  </button>
+</div>
 
     {gameOver && (
       <div className="play-again-button-container">
@@ -407,6 +501,12 @@ return (
       <p><strong>Net Earnings:</strong> ${cashOutSummary.profit}</p>
       <button onClick={() => window.location.reload()}>New Game</button>
     </div>
+  </div>
+)}
+
+{gameStarted && (
+  <div className="money-display">
+    Money: ${playerMoney}
   </div>
 )}
   </div>

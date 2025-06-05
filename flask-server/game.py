@@ -13,8 +13,7 @@ class Game:
         self.player = Player("Player")
         self.split_player = None
         self.dealer = Dealer("Dealer")
-        self.player_money = 3000 
-        self.max_money = self.player_money
+        self.max_money = self.player.money
         self.hands_won = 0
         self.last_bet = 0
         self._initialize_game()

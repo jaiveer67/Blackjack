@@ -1,7 +1,7 @@
 # Player and Dealer classes
 
 class Player:
-    def __init__(self, name, starting_money=3000):
+    def __init__(self, name, starting_money=2000):
         self.name = name
         self.hand = []
         self.money = starting_money

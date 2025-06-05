@@ -21,6 +21,7 @@ h1 {
   display: flex;
   justify-content: center;
   margin-bottom: 10px;
+  align-items: center;
 }
 
 .card {
@@ -51,16 +52,17 @@ button {
 
 .start-button-container {
   display: flex;
-  justify-content: center;
-  margin-bottom: 500px;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 400px;
 }
 
 .play-again-button-container {
   display: flex;
   justify-content: center;
   gap: 20px;
-  margin-top: 20px;
   margin-bottom: 50px;
+  margin-top: -150px;
 }
 
 .mute-button-container {
@@ -78,6 +80,8 @@ button {
 .hand-wrapper {
   text-align: center;
   gap: 100px;
+  margin-top: 20px;
+  flex-direction: column;
 }
 
 .result-message-wrapper {
@@ -91,7 +95,7 @@ button {
   text-align: center;
   font-weight: bold;
   font-size: 2em;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
 }
 
 .centered-result-message {
@@ -145,7 +149,8 @@ button {
 
 .betting-section {
   text-align: center;
-  margin-bottom: 250px;
+  margin-bottom: 200px;
+  margin-top: 100px;
 }
 
 .chip-container {
@@ -189,3 +194,24 @@ button {
   pointer-events: none; /* Prevent interaction behind the modal */
 }
 
+.start-logo {
+  width: 300px;
+}
+
+.money-display {
+  position: absolute;
+  top: 50px;
+  left: 50px;
+  font-size: 40px;
+  font-weight: bold;
+  color: rgb(0, 0, 0);
+  z-index: 10;
+}
+
+.current-bet-display {
+  text-align: center;
+  align-items: center;
+  font-size: 40px;
+  font-weight: bold;
+  color: #0a0a0a;
+}

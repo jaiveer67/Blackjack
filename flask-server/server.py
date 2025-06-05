@@ -12,6 +12,8 @@ def start():
         game.player.current_bet = game.last_bet
     else:
         game.player.current_bet = 0
+        game.last_bet = 0
+
     result = []
     game_over = False
 
@@ -88,7 +90,7 @@ def stand():
         elif game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2 and not (
         player.hand_value() == 21 and len(player.hand) == 2
     ):
-            return f"{prefix}Dealer has Blackjack. You lose."
+            return f"{prefix}Dealer Blackjack. You lose."
         elif game.dealer.is_bust():
             game.hands_won += 1
             game.player.money += bet * 2
@@ -152,12 +154,12 @@ def gameOver():
 @app.route("/reset", methods=["POST"])
 def reset():
     global game
-    game = Game()  # This will reset player_money to 3000
+    game = Game()
     return jsonify({"message": "Game fully reset."})
 
 @app.route("/cashout", methods=["GET"])
 def cash_out():
-    profit = game.player.money - game.player_money
+    profit = game.player.money - 2000
     return jsonify({
         "finalMoney": game.player.money,
         "maxMoney": game.max_money,
