@@ -18,13 +18,14 @@
 [ ] - Make sure display is consistent across platforms and devices
 [ ] - Add card animations / have only one card revealed at a time
 [ ] - Include help button with game instructions and rules
-[ ] - Total money in corner and wagered amount in middle
+[X] - Total money in corner and wagered amount in middle
 [X] - End music on bankrupt
 [ ] - If you bet larger amount than you have it automatically puts rest of your money into the bet
 [ ] - Swap player hand to bottom and dealer hand to top
 
 
 ### Future 
+[ ] - Seperate music and game sounds logic for mute (maybe as part of menu?)
 [ ] - Add basic strategy help button
 [ ] - Add more to summary (total hands, hands lost, hands pushed, largest hand won/lost, etc)
 [ ] - Add menu

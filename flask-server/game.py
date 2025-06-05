@@ -1,5 +1,6 @@
 # Main game logic
 from deck import Deck
+from card import Card
 from player import Player, Dealer
 
 player_wins = 0
@@ -156,6 +157,8 @@ class Game:
             card2 = self.player.hand[1]
 
             self.split_player = Player("Split Hand")
+            self.split_player.is_split_hand = True
+            self.player.is_split_hand = True
             self.split_player.current_bet = self.player.current_bet
             self.player.money -= self.player.current_bet
             self.player.hand = [card1]

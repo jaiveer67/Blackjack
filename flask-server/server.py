@@ -18,17 +18,9 @@ def start():
     game_over = False
 
     player_blackjack = game.player.hand_value() == 21
-    dealer_blackjack = game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2
 
     if player_blackjack:
         game_over = True
-        if dealer_blackjack:
-            result.append("Push")
-            game.player.money += game.player.current_bet
-        else:
-            result.append("BLACKJACK! YOU WIN!")
-            game.hands_won += 1
-            game.player.money += int(game.player.current_bet * 2.5)
 
     return jsonify({
         'playerHand': game.player_hand(),
@@ -84,6 +76,7 @@ def stand():
     def evaluate_hand(player, hand_label=None, bet_amount=None):
         prefix = f"{hand_label}: " if hand_label else ""
         bet = bet_amount or player.current_bet
+        is_initial_blackjack = len(player.hand) == 2 and player.hand_value() == 21 and not getattr(player, "is_split_hand", False)
 
         if player.is_bust():
             return f"{prefix}You busted! Dealer wins."
@@ -95,7 +88,7 @@ def stand():
             game.hands_won += 1
             game.player.money += bet * 2
             return f"{prefix}Dealer busted! You win!"
-        elif player.hand_value() == 21 and len(player.hand) == 2:
+        elif is_initial_blackjack:
             if game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2:
                 return f"{prefix}Push! Both got Blackjack."
             else:
@@ -145,8 +138,21 @@ def split():
 
 @app.route("/gameOver", methods=['GET'])
 def gameOver():
-    results = ["BLACKJACK! YOU WIN!"]
+    results = []
+    player_blackjack = game.player.hand_value() == 21
+    dealer_blackjack = game.dealer.hand_value() == 21
+
+    if player_blackjack:
+        if dealer_blackjack:
+            results.append("Push")
+            game.player.money += game.player.current_bet
+        else:
+            results.append("BLACKJACK! YOU WIN!")
+            game.hands_won += 1
+            game.player.money += int(game.player.current_bet * 2.5)
+
     return jsonify({
+        'playerMoney': game.player.money,
         'dealerValue': game.dealer.hand_value(),
         'results': results
     }) 

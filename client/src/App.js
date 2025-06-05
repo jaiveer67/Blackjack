@@ -128,7 +128,11 @@ setTimeout(() => {
     setGameOver(data.gameOver);
     setActiveHand(1);
     setBettingPhase(false);
-    if (data.gameOver) handleGameOver();
+    console.log(data.gameOver);
+    if (data.gameOver) {
+      playSound(blackjackSound);
+      handleGameOver();
+    }
     }, 3100);
 })
 };
@@ -168,7 +172,6 @@ const handleHit = () => {
       fetch("/stand")
         .then(response => response.json())
         .then(data => {
-          
           setDealerHand(data.dealerHand);
           setDealerValue(data.dealerValue);
           setGameOver(true);
@@ -252,12 +255,11 @@ const handlePlayAgain = () => {
 };
 
 const handleGameOver = () => {
-  setGameOver(true);
   fetch("/gameOver")
     .then(response => response.json())
     .then(data => {
+      setPlayerMoney(data.playerMoney);
       setDealerValue(data.dealerValue);
-      playSound(blackjackSound);
       setResultMessages(data.results || [])
     });
 };
@@ -304,7 +306,7 @@ const playSound = (sound) => {
 
 return (
   <div className="App">
-  <h1>Blackjack</h1>
+  <h1>BlackJack</h1>
 
   {!gameStarted && !bettingPhase && (
     <div className="start-button-container">
@@ -375,7 +377,13 @@ return (
   </div>
   <div className="hand-row">
     <div className="hand-label">
-  {cardsDealt ? `Hand 1 (${playerValue1})` : <span style={{ visibility: "hidden" }}>Hand 1 (00)</span>}
+  {cardsDealt ? (
+    <>
+      Hand 1 ({playerValue1}) {activeHand === 1 && <span>(Active)</span>}
+    </>
+  ) : (
+    <span style={{ visibility: "hidden" }}>Hand 1 (00)</span>
+  )}
 </div>
 
 
@@ -394,7 +402,13 @@ return (
   </div>
   <div className="hand-row">
     <div className="hand-label">
-  {cardsDealt ? `Hand 2 (${playerValue2})` : <span style={{ visibility: "hidden" }}>Hand 2 (00)</span>}
+  {cardsDealt ? (
+    <>
+      Hand 2 ({playerValue2}) {activeHand === 2 && <span>(Active)</span>}
+    </>
+  ) : (
+    <span style={{ visibility: "hidden" }}>Hand 2 (00)</span>
+  )}
 </div>
 
     <Hand cards={playerHand2} />
@@ -420,11 +434,9 @@ return (
 </div>
           )}
         </div>
-        {gameStarted && cardsDealt && !isSplit && (
-  <div className="current-bet-display">
+  <div className="current-bet-display" style={{ visibility: (cardsDealt && !isSplit)  ? 'visible' : 'hidden' }}>
     Bet: ${currentBet}
   </div>
-)}
         <div className="dealer-section">
           <div className="hand-row">
   <div className="hand-label" style={{ visibility: cardsDealt ? 'visible' : 'hidden' }}>
@@ -504,7 +516,7 @@ return (
   </div>
 )}
 
-{gameStarted && (
+{gameStarted && cardsDealt && (
   <div className="money-display">
     Money: ${playerMoney}
   </div>
