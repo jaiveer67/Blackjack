@@ -13,8 +13,10 @@ class Game:
         self.player = Player("Player")
         self.split_player = None
         self.dealer = Dealer("Dealer")
-        self.player_money = 3000  # set default
-        self.current_bet = 0
+        self.player_money = 3000 
+        self.max_money = self.player_money
+        self.hands_won = 0
+        self.last_bet = 0
         self._initialize_game()
 
     def _initialize_game(self):
@@ -24,13 +26,13 @@ class Game:
         self.deal_initial_cards()
 
     def reset_round(self):
+        self.max_money = max(self.max_money, self.player.money)
         self.split_player = None
         self.deck = Deck()
         self.deck.shuffle()
         self.player.reset_hand()
         self.dealer.reset_hand()
         self.deal_initial_cards()
-        self.current_bet = 0
 
     def place_bet(self, amount):
         if amount <= 0 or amount > self.player.money:
@@ -132,12 +134,31 @@ class Game:
     def dealer_hand(self):
         return [{'suit': card.suit, 'rank': card.rank} for card in self.dealer.hand]
     
+    def double(self):
+        if self.player.money >= self.player.current_bet:
+            self.player.money -= self.player.current_bet
+            self.player.current_bet *= 2
+            self.player.add_card(self.deck.draw_card())
+            return {
+                'playerHand': self.player_hand(),
+                'playerValue': self.player.hand_value(),
+                'gameOver': self.player.is_bust() or self.player.hand_value() == 21,
+                'playerMoney': self.player.money
+            }
+        else:
+            return {'error': 'Not enough money to double'}, 400
+        
     def split(self):
         if len(self.player.hand) == 2 and self.player.hand[0].value == self.player.hand[1].value:
+            if self.player.money < self.player.current_bet:
+                raise ValueError("Insufficient funds to split.")
+            
             card1 = self.player.hand[0]
             card2 = self.player.hand[1]
 
             self.split_player = Player("Split Hand")
+            self.split_player.current_bet = self.player.current_bet
+            self.player.money -= self.player.current_bet
             self.player.hand = [card1]
             self.split_player.hand = [card2]
 

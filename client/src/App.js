@@ -19,7 +19,10 @@ function App() {
   const [bettingPhase, setBettingPhase] = useState(false);
   const [currentBet, setCurrentBet] = useState(0);
   const [playerMoney, setPlayerMoney] = useState(3000);
-  const chipValues = [1, 10, 25, 50, 100];
+  const [showSummary, setShowSummary] = useState(false);
+  const [cashOutSummary, setCashOutSummary] = useState(null);
+  const [isBankrupt, setIsBankrupt] = useState(false);
+  const chipValues = [1, 10, 25, 50, 100, 500];
 
   const audioRef = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -33,16 +36,14 @@ useEffect(() => {
       audioRef.current = music;
     }
 
-    if (gameStarted) {
       audioRef.current.play().catch(err => {
         console.warn("Autoplay blocked:", err);
       });
-    }
 
     return () => {
       audioRef.current?.pause();
     };
-  }, [gameStarted]);
+  });
 
   useEffect(() => {
     if (audioRef.current) {
@@ -50,7 +51,7 @@ useEffect(() => {
     }
   }, [isMuted]);
 
-  const toggleMute = () => setIsMuted(prev => !prev);
+const toggleMute = () => setIsMuted(prev => !prev);
 
 const handleChipClick = (amount) => {
   if (playerMoney >= currentBet + amount) {
@@ -88,8 +89,9 @@ const handleDeal = () => {
       setActiveHand(1);
       setBettingPhase(false);   // Exit betting
       setGameStarted(true);     // Show game UI
-      setCurrentBet(data.currentBet)
-      if (data.gameOver) handleGameOver();
+      if (data.gameOver) {
+        handleGameOver()
+      }
     })
 };
 
@@ -133,6 +135,11 @@ const handleHit = () => {
           setGameOver(true);
           setResultMessages(data.results || []);
           setPlayerMoney(data.playerMoney);
+          if (data.playerMoney <= 0) {
+            setIsBankrupt(true);
+            setCashOutSummary(data);
+            setShowSummary(true);
+            }
         });
     }
   } else {
@@ -144,8 +151,29 @@ const handleHit = () => {
         setGameOver(true);
         setResultMessages(data.results || []);
         setPlayerMoney(data.playerMoney);
+        if (data.playerMoney <= 0) {
+            setIsBankrupt(true);
+            handleCashOut();
+            }
       });
   }
+};
+
+const handleDouble = () => {
+  fetch("/double", { method: "POST" })
+    .then(res => res.json())
+    .then(data => {
+      if (data.error) {
+        alert(data.error);
+        return;
+      }
+      setPlayerHand1(data.playerHand);
+      setPlayerValue1(data.playerValue);
+      setPlayerMoney(data.playerMoney);
+      setGameOver(data.gameOver);
+      // End turn after double (whether bust or not)
+      handleStand();
+    });
 };
 
 const handleSplit = () => {
@@ -169,7 +197,7 @@ const handlePlayAgain = () => {
       setResultMessages([]);
       setPlayerHand2([]);
       setPlayerValue2(0);
-      setCurrentBet(0);
+      setCurrentBet(data.currentBet);
       setBettingPhase(true);  // Go back to betting screen
       setGameStarted(false); 
     });
@@ -201,6 +229,15 @@ const handleReset = () => {
         setResultMessages([]);
         setBettingPhase(true);  // move to betting screen
       });
+};
+
+const handleCashOut = () => {
+  fetch("/cashout")
+    .then(res => res.json())
+    .then(data => {
+      setCashOutSummary(data);
+      setShowSummary(true);
+    });
 };
 
 const getCardValue = (card) => {
@@ -249,16 +286,23 @@ return (
       >
         Deal
       </button>
-    </div>
-  )}
-
-    <div className ="mute-button-container">
+      <div className="cashout-button-container">
+    <button onClick={handleCashOut}>Cash Out</button>
+  </div>
+      <div className ="mute-button-container">
     <button onClick={toggleMute}>
         {isMuted ? 'Unmute' : 'Mute'}
       </button>
 </div>
+    </div>
+  )}
     {gameStarted && (
       <>
+      <div className ="mute-button-container">
+    <button onClick={toggleMute}>
+        {isMuted ? 'Unmute' : 'Mute'}
+      </button>
+</div>
         <div className="hands-section">
           {playerHand2.length > 0 ? (
             <div className="split-hands">
@@ -322,6 +366,9 @@ return (
   <div className="controls">
     <button onClick={handleHit}>Hit</button>
     <button onClick={handleStand}>Stand</button>
+    <button onClick={handleDouble}
+    disabled={playerMoney < currentBet}
+    >Double</button>
     {playerHand1.length === 2 &&
       getCardValue(playerHand1[0]) === getCardValue(playerHand1[1]) &&
       playerValue2 === 0 && (
@@ -335,6 +382,33 @@ return (
         <button onClick={handlePlayAgain}>Play Again</button>
       </div>
     )}
+
+    {showSummary && cashOutSummary && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <h2>Game Summary</h2>
+      <p><strong>Final Money:</strong> ${cashOutSummary.finalMoney}</p>
+      <p><strong>Max Money Reached:</strong> ${cashOutSummary.maxMoney}</p>
+      <p><strong>Hands Won:</strong> {cashOutSummary.handsWon}</p>
+      <p><strong>Net Earnings:</strong> ${cashOutSummary.profit}</p>
+      <button onClick={() => window.location.reload()}>New Game</button>
+    </div>
+  </div>
+)}
+
+{showSummary && cashOutSummary && isBankrupt && (
+  <div className="modal-overlay">
+    <div className="modal-content">
+      <h2>Bankrupt!</h2>
+      <p>You lose! Better luck next time.</p>
+      <p><strong>Final Money:</strong> ${cashOutSummary.finalMoney}</p>
+      <p><strong>Max Money Reached:</strong> ${cashOutSummary.maxMoney}</p>
+      <p><strong>Hands Won:</strong> {cashOutSummary.handsWon}</p>
+      <p><strong>Net Earnings:</strong> ${cashOutSummary.profit}</p>
+      <button onClick={() => window.location.reload()}>New Game</button>
+    </div>
+  </div>
+)}
   </div>
 );
 }

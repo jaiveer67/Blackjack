@@ -8,6 +8,10 @@ game = Game()
 @app.route("/start", methods=["GET"])
 def start():
     game.reset_round()
+    if game.player.money >= game.last_bet:
+        game.player.current_bet = game.last_bet
+    else:
+        game.player.current_bet = 0
     result = []
     game_over = False
 
@@ -21,6 +25,7 @@ def start():
             game.player.money += game.player.current_bet
         else:
             result.append("BLACKJACK! YOU WIN!")
+            game.hands_won += 1
             game.player.money += int(game.player.current_bet * 2.5)
 
     return jsonify({
@@ -30,7 +35,8 @@ def start():
         'dealerValue': game.dealer.hand[0].value,
         'gameOver': game_over,
         'result': result,
-        'playerMoney': game.player.money
+        'playerMoney': game.player.money,
+        'currentBet': game.player.current_bet
     })
 
 @app.route("/bet/<int:amount>", methods=["POST"])
@@ -39,6 +45,7 @@ def place_bet(amount):
         return jsonify({"error": "Invalid bet"}), 400
 
     game.player.current_bet = amount
+    game.last_bet = amount
     game.player.money -= amount
     return jsonify({
         "playerMoney": game.player.money,
@@ -72,33 +79,40 @@ def stand():
 
     results = []
 
-    def evaluate_hand(player, hand_label=None):
+    def evaluate_hand(player, hand_label=None, bet_amount=None):
         prefix = f"{hand_label}: " if hand_label else ""
-        bet = game.player.current_bet if not hand_label else int(game.player.current_bet / 2)
+        bet = bet_amount or player.current_bet
 
-        if game.player.is_bust():
+        if player.is_bust():
             return f"{prefix}You busted! Dealer wins."
+        elif game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2 and not (
+        player.hand_value() == 21 and len(player.hand) == 2
+    ):
+            return f"{prefix}Dealer has Blackjack. You lose."
         elif game.dealer.is_bust():
+            game.hands_won += 1
             game.player.money += bet * 2
             return f"{prefix}Dealer busted! You win!"
-        elif game.player.hand_value() == 21 and len(game.player.hand) == 2:
+        elif player.hand_value() == 21 and len(player.hand) == 2:
             if game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2:
                 return f"{prefix}Push! Both got Blackjack."
             else:
                 game.player.money += bet * 2.5
+                game.hands_won += 1
                 return f"{prefix}BLACKJACK! YOU WIN!"
-        elif game.player.hand_value() > game.dealer.hand_value():
+        elif player.hand_value() > game.dealer.hand_value():
             game.player.money += bet * 2
+            game.hands_won += 1
             return f"{prefix}You win!"
-        elif game.player.hand_value() < game.dealer.hand_value():
+        elif player.hand_value() < game.dealer.hand_value():
             return f"{prefix}Dealer wins."
         else:
             game.player.money += bet
             return f"{prefix}Push!"
 
     if game.split_player and game.split_player.hand:
-        results.append(evaluate_hand(game.player, "Hand 1"))
-        results.append(evaluate_hand(game.split_player, "Hand 2"))
+        results.append(evaluate_hand(game.player, "Hand 1", game.player.current_bet))
+        results.append(evaluate_hand(game.split_player, "Hand 2", game.split_player.current_bet))
     else:
         results.append(evaluate_hand(game.player))
 
@@ -109,6 +123,13 @@ def stand():
         'results': results,
         'playerMoney': game.player.money
     })
+
+@app.route("/double", methods=["POST"])
+def double():
+    result = game.double()
+    if isinstance(result, tuple):  # handles error response
+        return jsonify(result[0]), result[1]
+    return jsonify(result)
 
 @app.route("/split", methods=['GET'])
 def split():
@@ -133,6 +154,16 @@ def reset():
     global game
     game = Game()  # This will reset player_money to 3000
     return jsonify({"message": "Game fully reset."})
+
+@app.route("/cashout", methods=["GET"])
+def cash_out():
+    profit = game.player.money - game.player_money
+    return jsonify({
+        "finalMoney": game.player.money,
+        "maxMoney": game.max_money,
+        "handsWon": game.hands_won,
+        "profit": profit
+    })
 
 if __name__ == "__main__":
     app.run(debug=True)
