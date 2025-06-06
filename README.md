@@ -17,10 +17,25 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 - 👇 Interactive controls for:
   - **Hit** – take another card
   - **Stand** – end your turn and let the dealer play
+  - **Double** – double your bet, receive one card, and end your turn
   - **Split** - split your hand into 2 if you have a pair
+  - **Rebet** – repeat your last bet with a single click
+  - **Cash Out** – view your session summary including final money, max money reached, hands won, and net earnings
+  - **Mute/Unmute** – toggle background music and sound effects
   - **Play Again** – reset and start a new round
-- ♠️ ♥️ **Card visuals** for both player and dealer hands
-- 🔄 **Stateful gameplay** with automatic bust detection
+
+
+🔊 Audio effects for card dealing and blackjack  
+♠️ ♥️ Visual card graphics with animated dealing one card at a time  
+🔄 Stateful gameplay with:
+- Automatic bust detection  
+- Blackjack vs. 21 distinction after splits  
+- Split hands managed independently with separate results  
+📈 Session tracking:
+- Starting money ($3000)
+- Bet management and chip selection
+- Tracks hands won and highest money reached
+📉 Bankruptcy screen when money hits $0  
 
 ---
 
@@ -28,17 +43,24 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 
 - **Frontend**: React (JavaScript)
 - **Backend**: Flask (Python)
-- **Communication**: RESTful API with `fetch`
+- **Communication**: RESTful API via `fetch`
 
 ---
 
 ## 🧩 Gameplay Notes
 
-- At the start, **only one dealer card is shown**.
-- Dealer's total is hidden until the player stands or busts.
+- Dealer's second card remains hidden until the player's turn ends.
 - Aces are treated as both 1/11, whichever is more helpful to the player.
-- Cards are randomly dealt from a full deck.
+- Deck is reshuffled each round.
+- After splitting, Blackjack is no longer possible — a 21 is just treated as a strong hand.
+- Double and Split actions require sufficient funds.
+- Cards are dealt one at a time with visual and audio feedback.
 
 ---
 
 ## 🛠 Setup Instructions
+
+To run the Blackjack Game locally, 
+1. Clone the repository and navigate to the root directory. Set up and activate a virtual environment if desired (python -m venv venv && source venv/bin/activate on Mac/Linux or venv\Scripts\activate on Windows).
+2. Navigate to the backend folder (cd flask-server) and install dependencies with pip install Flask, then start the Flask server using python server.py or python3 server.py (it will run at http://localhost:5000).
+3. In a new terminal, navigate to the frontend folder (cd client), install frontend dependencies with npm install, and start the React development server using npm start (it will run at http://localhost:3000). Make sure the frontend fetch requests are pointing to localhost:5000. Once both servers are running, open your browser and play the game at http://localhost:3000.
