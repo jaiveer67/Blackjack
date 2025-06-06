@@ -2,7 +2,7 @@
 
 ## 🎮 Introduction
 
-Welcome to my **Blackjack Game App** — a full-stack implementation of the classic casino card game. Built using **React** for the frontend and **Flask** (Python) for the backend, this application lets you play against a dealer with proper Blackjack rules and an interactive UI.
+Welcome to my **Blackjack Game App** — a full-stack implementation of the classic casino card game. Built using **React** (JavaScript) for the frontend and **Flask** (Python) for the backend, this application lets you play against a dealer with proper Blackjack rules and an interactive UI.
 
 Your goal is simple: **get as close to 21 as possible** without going over, and beat the dealer.
 
