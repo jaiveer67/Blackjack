@@ -9,6 +9,7 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
+  overflow: hidden;
 }
 
 h1 {
@@ -49,6 +50,7 @@ button {
   padding: 10px 20px;
   font-size: 32px;
   margin: 0 10px;
+  cursor: pointer;
 }
 
 .start-button-container {
@@ -216,3 +218,20 @@ button {
   font-weight: bold;
   color: #0a0a0a;
 }
+
+.chip {
+  width: 195px;
+  height: 195px;
+  background-image: url('./assets/images/poker_chips.png');
+  background-repeat: no-repeat;
+  display: inline-block;
+  transform: scale(0.7);     
+  cursor: pointer;
+  margin: -30px;
+}
+
+.chip-1 { background-position: -30px -340px; }  
+.chip-2 { background-position: -260px -340px; }
+.chip-3 { background-position: -490px -340px; }   
+.chip-4 { background-position: -30px -50px; }
+.chip-5 { background-position: -260px -50px; }

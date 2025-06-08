@@ -76,6 +76,19 @@ class Game:
         self.player.add_card(self.deck.draw_card())
         self.dealer.add_card(self.deck.draw_card())
 
+        """ self.player.add_card(Card('10', 'Spades'))
+        self.player.add_card(Card('A', 'Hearts'))
+
+        self.dealer.add_card(Card('5', 'Diamonds'))
+        self.dealer.add_card(Card('10', 'Clubs'))
+
+        # Force draw order
+        self.deck.cards = [
+            *self.deck.cards,  # Rest of the deck
+            Card('A', 'Clubs'),  # To be drawn by hand 2
+            Card('4', 'Spades'),  # To be drawn by hand 1
+        ] """
+
     def player_turn(self):
         self.hit = True
         print(f"\n{self.dealer.name}'s hand: [{self.dealer.hand[0]}, ?]")
@@ -142,7 +155,6 @@ class Game:
             return {
                 'playerHand': self.player_hand(),
                 'playerValue': self.player.hand_value(),
-                'gameOver': self.player.is_bust() or self.player.hand_value() == 21,
                 'playerMoney': self.player.money
             }
         else:

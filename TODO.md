@@ -1,4 +1,4 @@
-### Current (Improving terminal gameplay functionality)
+### Current
 
 [X] - Create function to deal with player blackjack (currently still gives player option to hit)
 [X] - Fix player being asked to hit on 21
@@ -14,17 +14,21 @@
 [X] - Create cash out button with summary of game 
 [X] - Create bankrupcy (lose condition)
 [X] - Automatically reset bet amount to previous bet, unless player money is < previous amount
-[ ] - Change buttons to chips 
+[X] - Change buttons to chips 
 [ ] - Make sure display is consistent across platforms and devices
-[ ] - Add card animations / have only one card revealed at a time
+[X] - Have only one card revealed at a time
 [ ] - Include help button with game instructions and rules
 [X] - Total money in corner and wagered amount in middle
 [X] - End music on bankrupt
-[ ] - If you bet larger amount than you have it automatically puts rest of your money into the bet
+[X] - If player doesn't have enough money, make those chip buttons disappear
 [ ] - Swap player hand to bottom and dealer hand to top
-
+[ ] - Make it so hands with A show both possible hand values (e.g 4/14 instead of just 14)
+[X] - Automatically take player back to betting screen after hand
 
 ### Future 
+[ ] - Add card animations
+[ ] - Include how much player won in result message
+[ ] - Multiple split hands
 [ ] - Seperate music and game sounds logic for mute (maybe as part of menu?)
 [ ] - Add basic strategy help button
 [ ] - Add more to summary (total hands, hands lost, hands pushed, largest hand won/lost, etc)
@@ -39,4 +43,4 @@
 [ ] - Add highscore tracking
 [ ] - Create settings where player can change things such as # of decks used, if dealer hits on soft 17, etc.
 [ ] - Clean up code (indentations, refactoring, variable naming, unused functions, etc.)
-[ ] - Maybe create hand limit?
+[ ] - Maybe create hand limit? (e.g play for 100 hands)

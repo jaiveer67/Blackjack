@@ -53,7 +53,7 @@ def hit_split(hand_number):
         return jsonify({
             'playerHand': game.player_hand(),
             'playerValue': game.player_value(),
-            'gameOver': game.player.is_bust(),
+            'gameOver': (game.player.is_bust() or game.player_value() == 21),
             'playerMoney': game.player.money
         })
     elif hand_number == 2 and game.split_player:
@@ -76,7 +76,7 @@ def stand():
     def evaluate_hand(player, hand_label=None, bet_amount=None):
         prefix = f"{hand_label}: " if hand_label else ""
         bet = bet_amount or player.current_bet
-        is_initial_blackjack = len(player.hand) == 2 and player.hand_value() == 21 and not getattr(player, "is_split_hand", False)
+        is_initial_blackjack = len(player.hand) == 2 and player.hand_value() == 21 and not getattr(player, "is_split_hand", True)
 
         if player.is_bust():
             return f"{prefix}You busted! Dealer wins."
