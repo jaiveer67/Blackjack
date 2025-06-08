@@ -8,11 +8,12 @@ game = Game()
 @app.route("/start", methods=["GET"])
 def start():
     game.reset_round()
-    if game.player.money >= game.last_bet:
-        game.player.current_bet = game.last_bet
-    else:
-        game.player.current_bet = 0
-        game.last_bet = 0
+
+    # if game.player.money >= game.last_bet:
+    #     game.player.current_bet = game.last_bet
+    # else:
+    #     game.player.current_bet = 0
+    #     game.last_bet = 0
 
     result = []
     game_over = False
@@ -41,6 +42,7 @@ def place_bet(amount):
     game.player.current_bet = amount
     game.last_bet = amount
     game.player.money -= amount
+
     return jsonify({
         "playerMoney": game.player.money,
         "currentBet": game.player.current_bet
@@ -76,33 +78,36 @@ def stand():
     def evaluate_hand(player, hand_label=None, bet_amount=None):
         prefix = f"{hand_label}: " if hand_label else ""
         bet = bet_amount or player.current_bet
-        is_initial_blackjack = len(player.hand) == 2 and player.hand_value() == 21 and not getattr(player, "is_split_hand", True)
-
+        print(">>> bet money before response:", bet)
+        is_initial_blackjack = (
+            len(player.hand) == 2 and
+            player.hand_value() == 21 and
+            not getattr(player, "is_split_hand", True)
+        )
         if player.is_bust():
             return f"{prefix}You busted! Dealer wins."
-        elif game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2 and not (
-        player.hand_value() == 21 and len(player.hand) == 2
-    ):
+        elif game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2 and not is_initial_blackjack:
             return f"{prefix}Dealer Blackjack. You lose."
         elif game.dealer.is_bust():
+            player.money += bet * 2
             game.hands_won += 1
-            game.player.money += bet * 2
             return f"{prefix}Dealer busted! You win!"
         elif is_initial_blackjack:
             if game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2:
+                player.money += bet  # Return original bet on push
                 return f"{prefix}Push! Both got Blackjack."
             else:
-                game.player.money += bet * 2.5
+                player.money += bet * 2.5
                 game.hands_won += 1
                 return f"{prefix}BLACKJACK! YOU WIN!"
         elif player.hand_value() > game.dealer.hand_value():
-            game.player.money += bet * 2
+            player.money += bet * 2
             game.hands_won += 1
             return f"{prefix}You win!"
         elif player.hand_value() < game.dealer.hand_value():
             return f"{prefix}Dealer wins."
         else:
-            game.player.money += bet
+            player.money += bet
             return f"{prefix}Push!"
 
     if game.split_player and game.split_player.hand:

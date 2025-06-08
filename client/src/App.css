@@ -53,6 +53,10 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: default; 
+}
+
 .start-button-container {
   display: flex;
   flex-direction: column;
@@ -228,6 +232,8 @@ button {
   transform: scale(0.7);     
   cursor: pointer;
   margin: -30px;
+  pointer-events: auto;
+  clip-path: circle(50%);
 }
 
 .chip-1 { background-position: -30px -340px; }  

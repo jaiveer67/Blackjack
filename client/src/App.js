@@ -30,6 +30,7 @@ function App() {
   const [isSplit, setIsSplit] = useState(false);
   const [turnOver, setTurnOver] = useState(false);
   const [revealedDealerCardsCount, setRevealedDealerCardsCount] = useState(1);
+  const [roundNumber, setRoundNumber] = useState(1);
 
   const chipValues = [1, 5, 25, 100, 500];
   const audioRef = useRef(null);
@@ -53,11 +54,17 @@ useEffect(() => {
     };
   });
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.muted = isMuted;
-    }
-  }, [isMuted]);
+useEffect(() => {
+  if (audioRef.current) {
+    audioRef.current.muted = isMuted;
+  }
+}, [isMuted]);
+
+useEffect(() => {
+  if (roundNumber > 1 && currentBet > 0) {
+    setLastBet(currentBet);
+  }
+}, [roundNumber, currentBet]);
 
 const toggleMute = () => setIsMuted(prev => !prev);
 
@@ -81,7 +88,11 @@ const handleDeal = () => {
     return;
   }
 
-  setLastBet(currentBet);
+  if (roundNumber === 1) {
+    setRoundNumber(2);
+  } else {
+    setLastBet(currentBet);
+  }
 
   fetch(`/bet/${currentBet}`, { method: "POST" })
     .then(res => {
@@ -244,7 +255,7 @@ const handleStand = () => {
       .then(response => response.json())
       .then(data => {
         setDealerHand(data.dealerHand);
-        graduallyRevealDealerCards(data);
+        graduallyRevealDealerCards(data)
       });
   }
 };
@@ -363,6 +374,7 @@ const handleReset = () => {
         setGameOver(false);
         setResultMessages([]);
         setBettingPhase(true);
+        setRoundNumber(1);
       });
 };
 
@@ -409,6 +421,7 @@ const calculateHandValue = (hand) => {
 };
 
 const playSound = (sound) => {
+  if (isMuted) return;
   const audio = new Audio(sound);
   audio.play();
 };
@@ -443,7 +456,10 @@ return (
       title={`$${value}`}
     />
 ))}
-      <button onClick={handleClearBet}>Clear</button>
+      <button onClick={handleClearBet}
+      disabled={currentBet === 0}
+      >Clear
+      </button>
       </div>
       <button 
         onClick={handleDeal} 
@@ -458,7 +474,7 @@ return (
         setCurrentBet(lastBet);
       }
     }}
-    disabled={lastBet <= 0 || lastBet > playerMoney}
+    disabled={lastBet <= 0 || lastBet > playerMoney || roundNumber <= 1}
     className="deal-button"
   >
     Rebet
@@ -601,8 +617,8 @@ return (
   <div className="modal-overlay">
     <div className="modal-content">
       <h2>Game Summary</h2>
-      <p><strong>Final Money:</strong> ${cashOutSummary.finalMoney}</p>
-      <p><strong>Max Money Reached:</strong> ${cashOutSummary.maxMoney}</p>
+      <p><strong>Final Balance:</strong> ${cashOutSummary.finalMoney}</p>
+      <p><strong>Max Balance Reached:</strong> ${cashOutSummary.maxMoney}</p>
       <p><strong>Hands Won:</strong> {cashOutSummary.handsWon}</p>
       <p><strong>Net Earnings:</strong> ${cashOutSummary.profit}</p>
       <button onClick={() => window.location.reload()}>New Game</button>
@@ -615,8 +631,8 @@ return (
     <div className="modal-content">
       <h2>Bankrupt!</h2>
       <p>You lose! Better luck next time.</p>
-      <p><strong>Final Money:</strong> ${cashOutSummary.finalMoney}</p>
-      <p><strong>Max Money Reached:</strong> ${cashOutSummary.maxMoney}</p>
+      <p><strong>Final Balance:</strong> ${cashOutSummary.finalMoney}</p>
+      <p><strong>Max Balance Reached:</strong> ${cashOutSummary.maxMoney}</p>
       <p><strong>Hands Won:</strong> {cashOutSummary.handsWon}</p>
       <p><strong>Net Earnings:</strong> ${cashOutSummary.profit}</p>
       <button onClick={() => window.location.reload()}>New Game</button>

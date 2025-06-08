@@ -77,15 +77,15 @@ class Game:
         self.dealer.add_card(self.deck.draw_card())
 
         """ self.player.add_card(Card('10', 'Spades'))
-        self.player.add_card(Card('A', 'Hearts'))
+        self.player.add_card(Card('6', 'Hearts'))
 
-        self.dealer.add_card(Card('5', 'Diamonds'))
+        self.dealer.add_card(Card('8', 'Diamonds'))
         self.dealer.add_card(Card('10', 'Clubs'))
 
         # Force draw order
         self.deck.cards = [
             *self.deck.cards,  # Rest of the deck
-            Card('A', 'Clubs'),  # To be drawn by hand 2
+            Card('5', 'Clubs'),  # To be drawn by hand 2
             Card('4', 'Spades'),  # To be drawn by hand 1
         ] """
 
