@@ -19,6 +19,26 @@ class Player:
             ace_count -= 1
         return value
     
+    def display_hand_value(self):
+        total = 0
+        ace_count = 0
+
+        for card in self.hand:
+            if card.rank == 'A':
+                ace_count += 1
+            else:
+                total += card.value  # card.value is fine for non-aces
+
+        # Min value: treat all Aces as 1
+        min_value = total + ace_count * 1
+
+        # Max value: treat one Ace as 11 (10 more than 1), others as 1
+        if ace_count >= 1 and min_value + 10 <= 21:
+            max_value = min_value + 10
+            return f"{min_value} / {max_value}"
+        else:
+            return str(min_value)
+    
     def has_blackjack(self):
         if self.hand_value() == 21:
             print("\nBLACKJACK!")

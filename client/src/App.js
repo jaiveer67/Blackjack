@@ -13,7 +13,9 @@ function App() {
   const [activeHand, setActiveHand] = useState(1);
   const [dealerHand, setDealerHand] = useState([]);
   const [playerValue1, setPlayerValue1] = useState(0);
+  const [playerDisplayValue1, setPlayerDisplayValue1] = useState("");
   const [playerValue2, setPlayerValue2] = useState(0);
+  const [playerDisplayValue2, setPlayerDisplayValue2] = useState("");
   const [dealerValue, setDealerValue] = useState(0);
   const [gameStarted, setGameStarted] = useState(false);
   const [canDouble, setCanDouble] = useState(true);
@@ -21,6 +23,7 @@ function App() {
   const [resultMessages, setResultMessages] = useState([]);
   const [bettingPhase, setBettingPhase] = useState(false);
   const [currentBet, setCurrentBet] = useState(0);
+  const [baseBet, setBaseBet] = useState(0);
   const [playerMoney, setPlayerMoney] = useState(2000);
   const [showSummary, setShowSummary] = useState(false);
   const [cashOutSummary, setCashOutSummary] = useState(null);
@@ -73,6 +76,9 @@ const handleChipClick = (amount) => {
   if (playerMoney >= currentBet + amount) {
     setCurrentBet(prev => {
       const newBet = prev + amount;
+      if (roundNumber <= 1) {
+        setBaseBet(newBet);
+      }
       return newBet;
     });
   }
@@ -91,7 +97,7 @@ const handleDeal = () => {
   if (roundNumber === 1) {
     setRoundNumber(2);
   } else {
-    setLastBet(currentBet);
+    setLastBet(baseBet);
   }
 
   fetch(`/bet/${currentBet}`, { method: "POST" })
@@ -140,6 +146,7 @@ setTimeout(() => {
   setTimeout(() => {
     setPlayerMoney(data.playerMoney);
     setPlayerValue1(data.playerValue);
+    setPlayerDisplayValue1(data.playerDisplayValue);
     setDealerValue(data.dealerValue);
     setResultMessages(data.result || []);
     setGameOver(data.gameOver);
@@ -170,9 +177,11 @@ const handleHit = () => {
         if (activeHand === 1) {
           setPlayerHand1(data.playerHand);
           setPlayerValue1(data.playerValue);
+          setPlayerDisplayValue1(data.playerDisplayValue);
         } else {
           setPlayerHand2(data.playerHand);
           setPlayerValue2(data.playerValue);
+          setPlayerDisplayValue2(data.playerDisplayValue);
         }
 
         const moveToNextHand = activeHand === 1 && playerHand2.length > 0;
@@ -199,8 +208,10 @@ const handleHit = () => {
 
 const handleStand = () => {
   if (!isSplit || activeHand === 2) {
+  setPlayerDisplayValue2(`${(playerValue2)}`)
   setTurnOver(true);
   }
+  setPlayerDisplayValue1(`${(playerValue1)}`)
   const graduallyRevealDealerCards = (data) => {
   const totalCards = data.dealerHand.length;
   let i = 2;
@@ -225,13 +236,14 @@ const handleStand = () => {
         setGameOver(true);
         setTurnOver(true);
         setPlayerMoney(data.playerMoney);
-
+      }, 100);
+      setTimeout(() => {
         if (data.playerMoney <= 0) {
           setIsBankrupt(true);
           setIsMuted(true);
           handleCashOut();
         }
-      }, 100);
+}, 1500);
     }
   }, 600);
   setTimeout(() => {
@@ -243,6 +255,7 @@ const handleStand = () => {
     setActiveHand(2);
     const isBlackjack = playerHand2.length === 2 && playerValue2 === 21;
     if (isBlackjack) {
+      setTurnOver(true);
       fetch("/stand")
         .then(response => response.json())
         .then(data => {
@@ -274,9 +287,11 @@ const handleDouble = () => {
       if (activeHand === 1) { 
         setPlayerHand1(data.playerHand);
         setPlayerValue1(data.playerValue);
+        setPlayerDisplayValue1(data.playerDisplayValue);
       } else {
         setPlayerHand2(data.playerHand);
         setPlayerValue2(data.playerValue);
+        setPlayerDisplayValue2(data.playerDisplayValue);
       }
       setPlayerMoney(data.playerMoney);
       // End turn after double (whether bust or not)
@@ -300,12 +315,15 @@ const handleSplit = () => {
       setPlayerHand1(hand1);
       setPlayerHand2(hand2);
       setPlayerValue1(calculateHandValue(hand1));
+      setPlayerDisplayValue1(calculateDisplayValue(hand1));
       setPlayerValue2(calculateHandValue(hand2));
+      setPlayerDisplayValue2(calculateDisplayValue(hand2));
 
       setTimeout(() => {
         const updatedHand1 = [...hand1, extra1];
         setPlayerHand1(updatedHand1);
         setPlayerValue1(calculateHandValue(updatedHand1));
+        setPlayerDisplayValue1(calculateDisplayValue(updatedHand1));
         playSound(cardSound);
       }, 600);
 
@@ -313,13 +331,15 @@ const handleSplit = () => {
         const updatedHand2 = [...hand2, extra2];
         setPlayerHand2(updatedHand2);
         setPlayerValue2(calculateHandValue(updatedHand2));
+        setPlayerDisplayValue2(calculateDisplayValue(updatedHand2));
         playSound(cardSound);
+
         setTurnOver(false);
-        if (data.playerValue1 !== 21) {
-        setActiveHand(1)
-      } else {
-        setActiveHand(2)
-      }
+        if (calculateHandValue([...hand1, extra1]) !== 21) {
+          setActiveHand(1);
+        } else {
+          setActiveHand(2);
+        }
       }, 1200);
     });
 };
@@ -336,11 +356,14 @@ const handlePlayAgain = () => {
       setDealerValue(0);
       setRevealedDealerCardsCount(1);
       setPlayerValue1(0);
+      setPlayerDisplayValue1("");
       setResultMessages([]);
       setPlayerHand2([]);
       setPlayerValue2(0);
-      setCurrentBet(data.currentBet);
+      setPlayerDisplayValue2("");
       setBettingPhase(true);
+      setCurrentBet(0);
+      setBaseBet(0);
       setGameStarted(false); 
       handleClearBet();
     });
@@ -420,6 +443,28 @@ const calculateHandValue = (hand) => {
   return value;
 };
 
+function calculateDisplayValue(hand) {
+  let total = 0;
+  let aceCount = 0;
+
+  for (let card of hand) {
+    if (card.rank === 'A') {
+      aceCount += 1;
+    } else {
+      total += card.value;
+    }
+  }
+
+  const min = total + aceCount * 1;
+  const max = (aceCount >= 1 && min + 10 <= 21) ? min + 10 : min;
+
+  if (max === 21 || min === 21) {
+    return "21";
+  }
+
+  return min !== max ? `${min} / ${max}` : `${min}`;
+}
+
 const playSound = (sound) => {
   if (isMuted) return;
   const audio = new Audio(sound);
@@ -472,6 +517,7 @@ return (
     onClick={() => {
       if (lastBet > 0 && lastBet <= playerMoney) {
         setCurrentBet(lastBet);
+        setBaseBet(lastBet); 
       }
     }}
     disabled={lastBet <= 0 || lastBet > playerMoney || roundNumber <= 1}
@@ -509,7 +555,7 @@ return (
     <div className="hand-label">
   {cardsDealt ? (
     <>
-      Hand 1 ({playerValue1}) {activeHand === 1 && <span>(Active)</span>}
+      Hand 1 ({playerDisplayValue1}) {activeHand === 1 && <span>(Active)</span>}
     </>
   ) : (
     <span style={{ visibility: "hidden" }}>Hand 1 (00)</span>
@@ -534,7 +580,7 @@ return (
     <div className="hand-label">
   {cardsDealt ? (
     <>
-      Hand 2 ({playerValue2}) {!gameOver && activeHand === 2 && <span>(Active)</span>}
+      Hand 2 ({playerDisplayValue2}) {!gameOver && activeHand === 2 && <span>(Active)</span>}
     </>
   ) : (
     <span style={{ visibility: "hidden" }}>Hand 2 (00)</span>
@@ -557,7 +603,7 @@ return (
   </div>
   <div className="hand-row">
   <div className="hand-label">
-  {cardsDealt ? `Your Hand (${playerValue1})` : <span style={{ visibility: "hidden" }}>Your Hand (00)</span>}
+  {cardsDealt ? `Your Hand (${playerDisplayValue1})` : <span style={{ visibility: "hidden" }}>Your Hand (00)</span>}
 </div>
     <Hand cards={playerHand1} />
   </div>

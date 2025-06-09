@@ -22,7 +22,7 @@
 [X] - End music on bankrupt
 [X] - If player doesn't have enough money, make those chip buttons disappear
 [ ] - Swap player hand to bottom and dealer hand to top
-[ ] - Make it so hands with A show both possible hand values (e.g 4/14 instead of just 14)
+[X] - Make it so hands with A show both possible hand values (e.g 4/14 instead of just 14)
 [X] - Automatically take player back to betting screen after hand
 
 ### Future 

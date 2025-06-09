@@ -27,6 +27,7 @@ def start():
         'playerHand': game.player_hand(),
         'dealerHand': game.dealer_hand(),
         'playerValue': game.player.hand_value(),
+        'playerDisplayValue': game.player.display_hand_value(),
         'dealerValue': game.dealer.hand[0].value,
         'gameOver': game_over,
         'result': result,
@@ -55,6 +56,7 @@ def hit_split(hand_number):
         return jsonify({
             'playerHand': game.player_hand(),
             'playerValue': game.player_value(),
+            'playerDisplayValue': game.player.display_hand_value(),
             'gameOver': (game.player.is_bust() or game.player_value() == 21),
             'playerMoney': game.player.money
         })
@@ -63,6 +65,7 @@ def hit_split(hand_number):
         return jsonify({
             'playerHand': game.player2_hand(),
             'playerValue': game.player2_value(),
+            'playerDisplayValue': game.split_player.display_hand_value(),
             'gameOver': game.split_player.is_bust(),
             'playerMoney': game.player.money
         })
@@ -134,11 +137,15 @@ def double():
 @app.route("/split", methods=['GET'])
 def split():
     game.split()
+    print("DISPLAY VALUE:", game.player.display_hand_value())
+    print("DISPLAY VALUE2:", game.split_player.display_hand_value())
     return jsonify({
         'playerHand1': game.player_hand(),
         'playerHand2': game.player2_hand(),
         'playerValue1': game.player_value(),
-        'playerValue2': game.player2_value()
+        'playerDisplayValue': game.player.display_hand_value(),
+        'playerValue2': game.player2_value(),
+        'playerDisplayValue2': game.split_player.display_hand_value()
     }) 
 
 @app.route("/gameOver", methods=['GET'])
