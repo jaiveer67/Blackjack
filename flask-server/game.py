@@ -71,23 +71,25 @@ class Game:
     #         self.dealer_turn()
 
     def deal_initial_cards(self):
-        # self.player.add_card(self.deck.draw_card())
-        # self.dealer.add_card(self.deck.draw_card())
-        # self.player.add_card(self.deck.draw_card())
-        # self.dealer.add_card(self.deck.draw_card())
+        self.player.add_card(self.deck.draw_card())
+        self.dealer.add_card(self.deck.draw_card())
+        self.player.add_card(self.deck.draw_card())
+        self.dealer.add_card(self.deck.draw_card())
 
-        self.player.add_card(Card('10', 'Spades'))
-        self.player.add_card(Card('10', 'Hearts'))
+        # self.player.add_card(Card('10', 'Spades'))
+        # self.player.add_card(Card('A', 'Hearts'))
 
-        self.dealer.add_card(Card('8', 'Diamonds'))
-        self.dealer.add_card(Card('10', 'Clubs'))
+        # self.dealer.add_card(Card('A', 'Diamonds'))
+        # self.dealer.add_card(Card('10', 'Clubs'))
 
-        # Force draw order
-        self.deck.cards = [
-            *self.deck.cards,  # Rest of the deck
-            Card('A', 'Clubs'),  # To be drawn by hand 2
-            Card('6', 'Spades'),  # To be drawn by hand 1
-        ]
+        # # Force draw order
+        # self.deck.cards = [
+        #     *self.deck.cards,  # Rest of the deck
+        #     Card('2', 'Spades'),
+        #     Card('3', 'Diamonds'),
+        #     Card('2', 'Clubs'),  # To be drawn by hand 2
+        #     Card('3', 'Spades'),  # To be drawn by hand 1
+        # ]
 
     def player_turn(self):
         self.hit = True
@@ -147,19 +149,19 @@ class Game:
     def dealer_hand(self):
         return [{'suit': card.suit, 'rank': card.rank} for card in self.dealer.hand]
     
-    def double(self):
-        if self.player.money >= self.player.current_bet:
-            self.player.money -= self.player.current_bet
-            self.player.current_bet *= 2
-            self.player.add_card(self.deck.draw_card())
-            return {
-                'playerHand': self.player_hand(),
-                'playerValue': self.player.hand_value(),
-                'playerMoney': self.player.money,
-                'playerDisplayValue': self.player.display_hand_value()
-            }
-        else:
-            return {'error': 'Not enough money to double'}, 400
+    # def double(self):
+    #     if self.player.money >= self.player.current_bet:
+    #         self.player.money -= self.player.current_bet
+    #         self.player.current_bet *= 2
+    #         self.player.add_card(self.deck.draw_card())
+    #         return {
+    #             'playerHand': self.player_hand(),
+    #             'playerValue': self.player.hand_value(),
+    #             'playerMoney': self.player.money,
+    #             'playerDisplayValue': self.player.display_hand_value()
+    #         }
+    #     else:
+    #         return {'error': 'Not enough money to double'}, 400
         
     def split(self):
         if len(self.player.hand) == 2 and self.player.hand[0].value == self.player.hand[1].value:

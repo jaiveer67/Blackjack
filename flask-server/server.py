@@ -81,7 +81,6 @@ def stand():
     def evaluate_hand(player, hand_label=None, bet_amount=None):
         prefix = f"{hand_label}: " if hand_label else ""
         bet = bet_amount or player.current_bet
-        print(">>> bet money before response:", bet)
         is_initial_blackjack = (
             len(player.hand) == 2 and
             player.hand_value() == 21 and
@@ -92,25 +91,25 @@ def stand():
         elif game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2 and not is_initial_blackjack:
             return f"{prefix}Dealer Blackjack. You lose."
         elif game.dealer.is_bust():
-            player.money += bet * 2
+            game.player.money += bet * 2
             game.hands_won += 1
             return f"{prefix}Dealer busted! You win!"
         elif is_initial_blackjack:
             if game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2:
-                player.money += bet  # Return original bet on push
+                game.player.money += bet  # Return original bet on push
                 return f"{prefix}Push! Both got Blackjack."
             else:
-                player.money += bet * 2.5
+                game.player.money += bet * 2.5
                 game.hands_won += 1
                 return f"{prefix}BLACKJACK! YOU WIN!"
         elif player.hand_value() > game.dealer.hand_value():
-            player.money += bet * 2
+            game.player.money += bet * 2
             game.hands_won += 1
             return f"{prefix}You win!"
         elif player.hand_value() < game.dealer.hand_value():
             return f"{prefix}Dealer wins."
         else:
-            player.money += bet
+            game.player.money += bet
             return f"{prefix}Push!"
 
     if game.split_player and game.split_player.hand:
@@ -127,25 +126,43 @@ def stand():
         'playerMoney': game.player.money
     })
 
-@app.route("/double", methods=["POST"])
-def double():
-    result = game.double()
-    if isinstance(result, tuple):  # handles error response
-        return jsonify(result[0]), result[1]
-    return jsonify(result)
+@app.route("/double/<int:hand_number>", methods=["POST"])
+def double(hand_number):
+    if hand_number == 1:
+        player = game.player
+        get_hand = game.player_hand 
+    elif hand_number == 2 and game.split_player:
+        player = game.split_player
+        get_hand = game.player2_hand
+    else:
+        return jsonify({'error': 'Invalid hand'}), 400
+
+    if game.player.money >= player.current_bet:
+        game.player.money -= player.current_bet
+        player.current_bet *= 2
+        player.add_card(game.deck.draw_card())
+
+        return jsonify({
+            'playerHand': get_hand(),
+            'playerValue': player.hand_value(),
+            'playerDisplayValue': player.display_hand_value(),
+            'playerMoney': game.player.money
+        })
+    else:
+        return jsonify({'error': 'Not enough money to double'}), 400
+
 
 @app.route("/split", methods=['GET'])
 def split():
     game.split()
-    print("DISPLAY VALUE:", game.player.display_hand_value())
-    print("DISPLAY VALUE2:", game.split_player.display_hand_value())
     return jsonify({
         'playerHand1': game.player_hand(),
         'playerHand2': game.player2_hand(),
         'playerValue1': game.player_value(),
         'playerDisplayValue': game.player.display_hand_value(),
         'playerValue2': game.player2_value(),
-        'playerDisplayValue2': game.split_player.display_hand_value()
+        'playerDisplayValue2': game.split_player.display_hand_value(),
+        'playerMoney': game.player.money
     }) 
 
 @app.route("/gameOver", methods=['GET'])

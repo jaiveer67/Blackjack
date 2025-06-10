@@ -7,3 +7,5 @@ screen shifts a bit after hand is finished in order to show results
 title and mute button shift to right after pressing deal
 
 split button shows if youve already split and could technically split again
+
+Dealer hand shows a bit too quickly on player blackjack

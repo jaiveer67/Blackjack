@@ -17,7 +17,7 @@
 [X] - Change buttons to chips 
 [ ] - Make sure display is consistent across platforms and devices
 [X] - Have only one card revealed at a time
-[ ] - Include help button with game instructions and rules
+[X] - Include help button with game instructions and rules
 [X] - Total money in corner and wagered amount in middle
 [X] - End music on bankrupt
 [X] - If player doesn't have enough money, make those chip buttons disappear
@@ -38,7 +38,7 @@
 [ ] - Create option for player to take insurance when dealer shows an Ace
 [ ] - Incorporate the ability to play multiple hands at once
 [ ] - Create side bets
-[ ] - Use more decks (currently uses 1 I think)
+[ ] - Use more decks (currently uses 1)
 [ ] - Add saving/loading
 [ ] - Add highscore tracking
 [ ] - Create settings where player can change things such as # of decks used, if dealer hits on soft 17, etc.
