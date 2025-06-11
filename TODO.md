@@ -24,8 +24,14 @@
 [ ] - Swap player hand to bottom and dealer hand to top
 [X] - Make it so hands with A show both possible hand values (e.g 4/14 instead of just 14)
 [X] - Automatically take player back to betting screen after hand
+[X] - Add saving/loading
+[X] - Use more decks (currently uses 1) - default is now 6 decks 
+[ ] - Create settings where player can change things such as # of decks used, if dealer hits on soft 17, etc.
+[ ] - Add surrender option
+[ ] - Create option for player to take insurance when dealer shows an Ace
+[ ] - Add highscore tracking
 
-### Future 
+### Future Possibilities
 [ ] - Add card animations
 [ ] - Include how much player won in result message
 [ ] - Multiple split hands
@@ -33,14 +39,7 @@
 [ ] - Add basic strategy help button
 [ ] - Add more to summary (total hands, hands lost, hands pushed, largest hand won/lost, etc)
 [ ] - Add menu
-[ ] - Add surrender option
-[ ] - Add insurance option
-[ ] - Create option for player to take insurance when dealer shows an Ace
 [ ] - Incorporate the ability to play multiple hands at once
 [ ] - Create side bets
-[ ] - Use more decks (currently uses 1)
-[ ] - Add saving/loading
-[ ] - Add highscore tracking
-[ ] - Create settings where player can change things such as # of decks used, if dealer hits on soft 17, etc.
 [ ] - Clean up code (indentations, refactoring, variable naming, unused functions, etc.)
 [ ] - Maybe create hand limit? (e.g play for 100 hands)

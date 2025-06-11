@@ -2,6 +2,7 @@
 from deck import Deck
 from card import Card
 from player import Player, Dealer
+from settings import load_settings
 
 player_wins = 0
 dealer_wins = 0
@@ -10,7 +11,9 @@ hit = False
 
 class Game:
     def __init__(self):
-        self.deck = Deck()
+        deck_count = load_settings()
+        self.deck = Deck(num_decks=deck_count)
+        print(len(self.deck.cards))
         self.player = Player("Player")
         self.split_player = None
         self.dealer = Dealer("Dealer")
@@ -28,7 +31,7 @@ class Game:
     def reset_round(self):
         self.max_money = max(self.max_money, self.player.money)
         self.split_player = None
-        self.deck = Deck()
+        self.deck = Deck(num_decks=load_settings()) 
         self.deck.shuffle()
         self.player.reset_hand()
         self.dealer.reset_hand()
@@ -135,10 +138,10 @@ class Game:
         print("\nYour wins:", player_wins, "\nDealer's wins:", dealer_wins, "\nDraws:", draws)
 
     def player_hand(self):
-        return [{'suit': card.suit, 'rank': card.rank, 'value': card.value} for card in self.player.hand]
+        return [{'rank': card.rank, 'suit': card.suit, 'value': card.value} for card in self.player.hand]
     
     def player2_hand(self):
-        return [{'suit': card.suit, 'rank': card.rank, 'value': card.value} for card in self.split_player.hand] if self.split_player else []
+        return [{'rank': card.rank, 'suit': card.suit, 'value': card.value} for card in self.split_player.hand] if self.split_player else []
     
     def player_value(self):
         return self.player.hand_value()
@@ -147,7 +150,7 @@ class Game:
         return self.split_player.hand_value() if self.split_player else 0
     
     def dealer_hand(self):
-        return [{'suit': card.suit, 'rank': card.rank} for card in self.dealer.hand]
+        return [{'rank': card.rank, 'suit': card.suit, 'value': card.value} for card in self.dealer.hand]
     
     # def double(self):
     #     if self.player.money >= self.player.current_bet:

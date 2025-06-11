@@ -39,6 +39,9 @@ function App() {
   const [showHelp, setShowHelp] = useState(false);
   const [helpPage, setHelpPage] = useState(1);
   const [hitEndedTurn, setHitEndedTurn] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [selectedDecks, setSelectedDecks] = useState(null);
+  const [hasSave, setHasSave] = useState(false);
 
   const chipValues = [1, 5, 25, 100, 500];
   const audioRef = useRef(null);
@@ -91,6 +94,18 @@ useEffect(() => {
   }
 // eslint-disable-next-line react-hooks/exhaustive-deps
 }, [activeHand, playerValue2, isSplit]);
+
+useEffect(() => {
+  fetch('/get-deck-count')
+    .then(res => res.json())
+    .then(data => setSelectedDecks(data.deckCount));
+}, []);
+
+useEffect(() => {
+  fetch("/has-save")
+    .then(res => res.json())
+    .then(data => setHasSave(data.hasSave));
+}, []);
 
 const toggleMute = () => setIsMuted(prev => !prev);
 
@@ -481,7 +496,10 @@ const handleCashOut = () => {
       setCashOutSummary(data);
       setShowSummary(true);
       setIsMuted(true);
-    });
+      return fetch('/has-save');
+    })
+    .then(res => res.json())
+    .then(data => setHasSave(data.hasSave));
 };
 
 const getCardValue = (card) => {
@@ -545,9 +563,49 @@ const playSound = (sound) => {
   audio.play();
 };
 
+function applyOptions(deckCount) {
+  fetch(`/set-decks/${deckCount}`, { method: 'POST' })
+    .then(res => res.json())
+    .then(() => {
+      return fetch('/get-deck-count');
+    })
+    .then(res => res.json())
+    .then(data => {
+      setSelectedDecks(data.deckCount);
+      setShowOptions(false);
+    });
+}
+
+function handleLoadGame() {
+  fetch('/load-game', {
+    method: 'POST'
+  })
+    .then(res => {
+      if (!res.ok) {
+        throw new Error("No saved game found");
+      }
+      return res.json();
+    })
+    .then(data => {
+      setPlayerMoney(data.playerMoney);
+      setGameStarted(false);
+      setBettingPhase(true);
+    })
+    .catch((err) => {
+      console.error("Load failed:", err);
+      alert("No saved game found.");
+    });
+}
+
 return (
   <div className="App">
   <h1>BlackJack</h1>
+
+  {bettingPhase && !gameStarted && (
+    <button className="top-left-options-button" onClick={() => setShowOptions(true)}>
+      Options
+    </button>
+      )}
 
   {!gameStarted && !bettingPhase && (
     <div className="start-button-container">
@@ -555,8 +613,14 @@ return (
       <button
   onClick={handleReset}
 >
-  Start Game
+  Start New Game
 </button>
+{hasSave && (
+      <button onClick={handleLoadGame}
+      style={{ marginTop: "40px" }}
+      >Load Game
+      </button>
+    )}
     </div>
   )}
 
@@ -842,10 +906,42 @@ return (
           <button onClick={() => setHelpPage(helpPage + 1)}>Next</button>
         )}
       </div>
+      </div>
+      </div>
+)}
+{showOptions && (
+  <div className="options-modal-overlay">
+    <div className="options-modal-content">
+      <button
+        className="close-options-x"
+        onClick={() => setShowOptions(false)}
+      >
+        ❌
+      </button>
+      <h2>Game Options</h2>
+      <label htmlFor="deck-select">Number of Decks:</label>
+      <select
+        id="deck-select"
+        value={selectedDecks}
+        onChange={(e) => setSelectedDecks(parseInt(e.target.value))}
+      >
+        {[1, 2, 4, 6, 8].map((n) => (
+          <option key={n} value={n}>{n}</option>
+        ))}
+      </select>
+      <button
+        className="apply-options-button"
+        onClick={() => {
+          applyOptions(selectedDecks);
+          setShowOptions(false);
+        }}
+      >
+        Apply
+      </button>
     </div>
   </div>
 )}
-  </div>
+    </div>
 );
 }
 export default App;

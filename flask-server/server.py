@@ -1,9 +1,14 @@
 from flask import Flask, jsonify
 from game import Game
+from deck import Deck
+from settings import save_settings, load_settings
+from save import save_game_state, load_game_state
+import os
 
 app = Flask(__name__)
 
 game = Game()
+SAVE_FILE = "savegame.json"
 
 @app.route("/start", methods=["GET"])
 def start():
@@ -111,13 +116,14 @@ def stand():
         else:
             game.player.money += bet
             return f"{prefix}Push!"
-
     if game.split_player and game.split_player.hand:
         results.append(evaluate_hand(game.player, "Hand 1", game.player.current_bet))
         results.append(evaluate_hand(game.split_player, "Hand 2", game.split_player.current_bet))
     else:
         results.append(evaluate_hand(game.player))
-
+    save_game_state(game)
+    if game.player.money <= 0 and os.path.exists(SAVE_FILE):
+        os.remove(SAVE_FILE)
     return jsonify({
         'dealerHand': game.dealer_hand(),
         'dealerValue': game.dealer.hand_value(),
@@ -195,6 +201,8 @@ def reset():
 @app.route("/cashout", methods=["GET"])
 def cash_out():
     profit = game.player.money - 2000
+    if os.path.exists(SAVE_FILE):
+        os.remove(SAVE_FILE)
     return jsonify({
         "finalMoney": game.player.money,
         "maxMoney": game.max_money,
@@ -202,5 +210,31 @@ def cash_out():
         "profit": profit
     })
 
+@app.route("/get-deck-count", methods=["GET"])
+def get_deck_count():
+    deck_count = load_settings()
+    return jsonify({"deckCount": deck_count})
+
+@app.route("/set-decks/<int:deck_count>", methods=["POST"])
+def set_decks(deck_count):
+    save_settings(deck_count)
+    return jsonify({"message": f"Deck count set to {deck_count}."})
+
+@app.route("/has-save", methods=["GET"])
+def has_save():
+    return jsonify({"hasSave": os.path.exists(SAVE_FILE)})
+
+@app.route("/load-game", methods=["POST"])
+def load_game():
+    try:
+        load_game_state(game)
+        return jsonify({
+            "playerMoney": game.player.money,
+            "gameOver": False,
+            "cardsDealt": True,
+        })
+    except FileNotFoundError:
+        return jsonify({"error": "No saved game"}), 404
+    
 if __name__ == "__main__":
     app.run(debug=True)
