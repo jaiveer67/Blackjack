@@ -2,8 +2,8 @@ from flask import Flask, jsonify
 from game import Game
 from deck import Deck
 from settings import save_settings, load_settings
-from save import save_game_state, load_game_state
-import os
+from save import save_game_state, load_game_state, save_highscores, load_highscores
+import os, json
 
 app = Flask(__name__)
 
@@ -121,7 +121,14 @@ def stand():
         results.append(evaluate_hand(game.split_player, "Hand 2", game.split_player.current_bet))
     else:
         results.append(evaluate_hand(game.player))
+
     save_game_state(game)
+
+    game.max_money = max(game.max_money, game.player.money)
+    highscores = load_highscores()
+    if game.max_money > highscores.get("max_balance", 2000):
+        save_highscores(highscores.get("cashout", 2000), game.max_money)
+
     if game.player.money <= 0 and os.path.exists(SAVE_FILE):
         os.remove(SAVE_FILE)
     return jsonify({
@@ -201,13 +208,28 @@ def reset():
 @app.route("/cashout", methods=["GET"])
 def cash_out():
     profit = game.player.money - 2000
+    final = game.player.money
+    highscores = load_highscores()
+    old_cashout = highscores["cashout"]
+    old_max = highscores["max_balance"]
+
+    is_new_cashout = final > old_cashout
+    is_new_max = game.max_money > old_max
+
+    if final > 2000:
+        save_highscores(final, game.max_money)
+
     if os.path.exists(SAVE_FILE):
         os.remove(SAVE_FILE)
     return jsonify({
         "finalMoney": game.player.money,
         "maxMoney": game.max_money,
         "handsWon": game.hands_won,
-        "profit": profit
+        "profit": profit,
+        "isNewCashout": is_new_cashout,
+        "isNewMax": is_new_max,
+        "highCashout": max(final, old_cashout),
+        "highMaxMoney": max(game.max_money, old_max)
     })
 
 @app.route("/get-deck-count", methods=["GET"])
@@ -235,6 +257,18 @@ def load_game():
         })
     except FileNotFoundError:
         return jsonify({"error": "No saved game"}), 404
+    
+@app.route("/get-highscores", methods=["GET"])
+def get_highscores():
+    try:
+        with open("highscore.json", "r") as f:
+            highscores = json.load(f)
+            return jsonify({
+                "cashout": highscores.get("cashout", 0),
+                "max_balance": highscores.get("max_balance", 0)
+            })
+    except FileNotFoundError:
+        return jsonify({"cashout": 0, "max_balance": 0})
     
 if __name__ == "__main__":
     app.run(debug=True)

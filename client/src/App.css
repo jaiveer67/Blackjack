@@ -428,3 +428,52 @@ button:not(:disabled):hover {
 .top-left-options-button button:hover {
   background-color: #444;
 }
+
+.high-score-text {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #000000;
+  line-height: 1.6;
+  text-align: center;
+}
+
+.banner {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #2ecc71;
+  color: white;
+  padding: 15px 30px;
+  font-size: 1.5rem;
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+  z-index: 1002;
+  animation: fadeSlide 3s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes fadeSlide {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  90% {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -20px);
+  }
+}
+
+.new-max-banner {
+  background-color: #3498db; /* Blue variation */
+}
+

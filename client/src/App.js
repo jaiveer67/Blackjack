@@ -42,6 +42,10 @@ function App() {
   const [showOptions, setShowOptions] = useState(false);
   const [selectedDecks, setSelectedDecks] = useState(null);
   const [hasSave, setHasSave] = useState(false);
+   const [highCashout, setHighCashout] = useState(0);
+  const [highMaxMoney, setHighMaxMoney] = useState(0);
+  const [showMaxBalanceBanner, setShowMaxBalanceBanner] = useState(false);
+  const [showCashoutBanner, setShowCashoutBanner] = useState(false);
 
   const chipValues = [1, 5, 25, 100, 500];
   const audioRef = useRef(null);
@@ -105,6 +109,15 @@ useEffect(() => {
   fetch("/has-save")
     .then(res => res.json())
     .then(data => setHasSave(data.hasSave));
+}, []);
+
+useEffect(() => {
+  fetch("/get-highscores")
+    .then(res => res.json())
+    .then(data => {
+      setHighCashout(data.cashout);
+      setHighMaxMoney(data.max_balance);
+    });
 }, []);
 
 const toggleMute = () => setIsMuted(prev => !prev);
@@ -280,6 +293,12 @@ const handleStand = () => {
           setTurnOver(true);
           setPlayerMoney(data.playerMoney);
 
+          if (data.playerMoney > highMaxMoney) {
+            setHighMaxMoney(data.playerMoney);
+            setShowMaxBalanceBanner(true);
+            setTimeout(() => setShowMaxBalanceBanner(false), 3000); // hide after 3s
+          }
+
           if (data.playerMoney <= 0) {
             setIsBankrupt(true);
             setIsMuted(true);
@@ -313,6 +332,13 @@ const handleStand = () => {
           setGameOver(true);
           setTurnOver(true);
           setPlayerMoney(data.playerMoney);
+
+          if (data.playerMoney > highMaxMoney) {
+            setHighMaxMoney(data.playerMoney);
+            setShowMaxBalanceBanner(true);
+            setTimeout(() => setShowMaxBalanceBanner(false), 3000); // hide after 3s
+          }
+
 
           if (data.playerMoney <= 0) {
             setIsBankrupt(true);
@@ -362,6 +388,12 @@ const handleDouble = () => {
       }
 
       setPlayerMoney(data.playerMoney);
+
+      if (data.playerMoney > highMaxMoney) {
+        setHighMaxMoney(data.playerMoney);
+        setShowMaxBalanceBanner(true);
+        setTimeout(() => setShowMaxBalanceBanner(false), 3000); // hide after 3s
+}
 
       const isFinalHand = !isSplit || activeHand === 2;
       const hasSecondHand = isSplit && activeHand === 1;
@@ -463,6 +495,12 @@ const handleGameOver = () => {
     .then(data => {
       setRevealedDealerCardsCount(2);
       setPlayerMoney(data.playerMoney);
+
+      if (data.playerMoney > highMaxMoney) {
+        setHighMaxMoney(data.playerMoney);
+        setShowMaxBalanceBanner(true);
+        setTimeout(() => setShowMaxBalanceBanner(false), 3000); // hide after 3s
+}
       setDealerValue(data.dealerValue);
       setResultMessages(data.results || []);
       setTimeout(() => {
@@ -496,6 +534,13 @@ const handleCashOut = () => {
       setCashOutSummary(data);
       setShowSummary(true);
       setIsMuted(true);
+      setHighCashout(data.highCashout);
+      setHighMaxMoney(data.highMaxMoney);
+      // Optionally show message
+      if (data.isNewCashout) {
+        setShowCashoutBanner(true);
+        setTimeout(() => setShowCashoutBanner(false), 3000);
+      }
       return fetch('/has-save');
     })
     .then(res => res.json())
@@ -610,6 +655,12 @@ return (
   {!gameStarted && !bettingPhase && (
     <div className="start-button-container">
       <img src={logo} alt="Blackjack Logo" className="start-logo" />
+      {(highCashout > 2000 || highMaxMoney > 2000) && (
+  <div className="high-score-text">
+    <div>🏆 Cashout Record: ${highCashout}</div>
+    <div>📈 Max Balance Record: ${highMaxMoney}</div>
+  </div>
+)}
       <button
   onClick={handleReset}
 >
@@ -941,7 +992,19 @@ return (
     </div>
   </div>
 )}
-    </div>
+{showCashoutBanner && (
+  <div className="banner new-cashout-banner">
+    💰 New Cashout Record!
+  </div>
+)}
+
+{showMaxBalanceBanner && (
+  <div className="banner new-max-banner">
+    📈 New Max Balance Record!
+  </div>
+)}
+
+    </div>   
 );
 }
 export default App;
