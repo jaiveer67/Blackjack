@@ -22,7 +22,6 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
   - **Rebet** – repeat your last bet with a single click
   - **Cash Out** – view your session summary including final money, max money reached, hands won, and net earnings
   - **Mute/Unmute** – toggle background music and sound effects
-  - **Play Again** – reset and start a new round
 
 
 🔊 Audio effects for card dealing and blackjack  
@@ -31,11 +30,18 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 - Automatic bust detection  
 - Blackjack vs. 21 distinction after splits  
 - Split hands managed independently with separate results  
-📈 Session tracking:
-- Starting money ($3000)
+📈 Persistent Session tracking:
+- Starting money ($2000)
 - Bet management and chip selection
 - Tracks hands won and highest money reached
-📉 Bankruptcy screen when money hits $0  
+- Highest balance reached (max money)
+- Highest cashout value
+📉 Bankruptcy screen when money hits $0
+
+- ⚙️ **Custom Game Options**:
+  - Choose number of decks (1, 2, 4, 6, 8)
+  - Enable/disable **Dealer Hits on Soft 17**
+  - Options persist between games
 
 ---
 
@@ -55,6 +61,7 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 - After splitting, Blackjack is no longer possible — a 21 is just treated as a strong hand.
 - Double and Split actions require sufficient funds.
 - Cards are dealt one at a time with visual and audio feedback.
+- Game options (deck count & dealer rules) are saved between sessions.
 
 ---
 
