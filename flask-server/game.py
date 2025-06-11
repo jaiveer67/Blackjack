@@ -11,15 +11,19 @@ hit = False
 
 class Game:
     def __init__(self):
-        deck_count = load_settings()
-        self.deck = Deck(num_decks=deck_count)
-        print(len(self.deck.cards))
+        settings = load_settings()
+        self.num_decks = settings.get("deck_count", 6)
+        self.dealer_hits_soft_17 = settings.get("dealer_hits_soft_17", False)
+
+        self.deck = Deck(num_decks=self.num_decks)
         self.player = Player("Player")
         self.split_player = None
-        self.dealer = Dealer("Dealer")
+        self.dealer = Dealer(dealer_hits_soft_17=self.dealer_hits_soft_17)
+
         self.max_money = self.player.money
         self.hands_won = 0
         self.last_bet = 0
+
         self._initialize_game()
 
     def _initialize_game(self):
@@ -31,11 +35,20 @@ class Game:
     def reset_round(self):
         self.max_money = max(self.max_money, self.player.money)
         self.split_player = None
-        self.deck = Deck(num_decks=load_settings()) 
+        settings = load_settings()
+        self.deck = Deck(num_decks=settings.get("deck_count", 6))
+        self.dealer_hits_soft_17 = settings.get("dealer_hits_soft_17", False)
+        self.dealer = Dealer(dealer_hits_soft_17=self.dealer_hits_soft_17)
         self.deck.shuffle()
         self.player.reset_hand()
         self.dealer.reset_hand()
         self.deal_initial_cards()
+
+    def set_rules(self, deck_count, dealer_hits_soft_17):
+        self.num_decks = deck_count
+        self.dealer_hits_soft_17 = dealer_hits_soft_17
+        self.deck = Deck(num_decks=self.num_decks)
+        self.dealer = Dealer(dealer_hits_soft_17=self.dealer_hits_soft_17)
 
     def place_bet(self, amount):
         if amount <= 0 or amount > self.player.money:
@@ -80,10 +93,10 @@ class Game:
         self.dealer.add_card(self.deck.draw_card())
 
         # self.player.add_card(Card('10', 'Spades'))
-        # self.player.add_card(Card('A', 'Hearts'))
+        # self.player.add_card(Card('6', 'Hearts'))
 
         # self.dealer.add_card(Card('A', 'Diamonds'))
-        # self.dealer.add_card(Card('10', 'Clubs'))
+        # self.dealer.add_card(Card('6', 'Clubs'))
 
         # # Force draw order
         # self.deck.cards = [

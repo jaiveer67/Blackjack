@@ -84,5 +84,15 @@ class Player:
         self.current_bet = 0
     
 class Dealer(Player):
-        def should_draw(self):
-            return self.hand_value() < 17
+    def __init__(self, dealer_hits_soft_17=False):
+        super().__init__("Dealer")
+        self.dealer_hits_soft_17 = dealer_hits_soft_17
+
+    def should_draw(self):
+        value = self.hand_value()
+        has_soft_17 = value == 17 and any(card.rank == "A" for card in self.hand) and self.display_hand_value() != value
+        if value < 17:
+            return True
+        if self.dealer_hits_soft_17 and has_soft_17:
+            return True
+        return False

@@ -42,11 +42,11 @@ function App() {
   const [showOptions, setShowOptions] = useState(false);
   const [selectedDecks, setSelectedDecks] = useState(null);
   const [hasSave, setHasSave] = useState(false);
-   const [highCashout, setHighCashout] = useState(0);
+  const [highCashout, setHighCashout] = useState(0);
   const [highMaxMoney, setHighMaxMoney] = useState(0);
   const [showMaxBalanceBanner, setShowMaxBalanceBanner] = useState(false);
   const [showCashoutBanner, setShowCashoutBanner] = useState(false);
-
+  const [dealerHitsSoft17, setDealerHitsSoft17] = useState(false);
   const chipValues = [1, 5, 25, 100, 500];
   const audioRef = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
@@ -90,7 +90,7 @@ useEffect(() => {
 }, [playerValue1, hitEndedTurn]);
 
 useEffect(() => {
-  if (activeHand === 2 && isSplit && playerValue2 === 21) {
+  if (activeHand === 2 && playerValue2 === 21 && playerHand2.length === 2) {
     setTurnOver(true);
     setTimeout(() => {
       handleStand();
@@ -100,9 +100,12 @@ useEffect(() => {
 }, [activeHand, playerValue2, isSplit]);
 
 useEffect(() => {
-  fetch('/get-deck-count')
+  fetch('/get-options')
     .then(res => res.json())
-    .then(data => setSelectedDecks(data.deckCount));
+    .then(data => {
+      setSelectedDecks(data.deckCount);
+      setDealerHitsSoft17(data.dealerHitsSoft17);
+    });
 }, []);
 
 useEffect(() => {
@@ -266,7 +269,6 @@ const handleStand = () => {
       .then(res => res.json())
       .then(data => {
         graduallyRevealDealerCards(data);
-        setActiveHand(1);
       });
   } else if (isSplit && activeHand === 1) {
     // Switch to second hand
@@ -608,18 +610,32 @@ const playSound = (sound) => {
   audio.play();
 };
 
-function applyOptions(deckCount) {
-  fetch(`/set-decks/${deckCount}`, { method: 'POST' })
+function applyOptions(deckCount, dealerHitsSoft17) {
+  fetch('/set-options', {
+    method: 'POST',
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      deckCount,
+      dealerHitsSoft17
+    })
+  })
     .then(res => res.json())
     .then(() => {
-      return fetch('/get-deck-count');
-    })
-    .then(res => res.json())
-    .then(data => {
-      setSelectedDecks(data.deckCount);
+      setSelectedDecks(deckCount);
+      setDealerHitsSoft17(dealerHitsSoft17);
       setShowOptions(false);
     });
 }
+
+const openOptions = () => {
+  fetch("/get-options")
+    .then(res => res.json())
+    .then(data => {
+      setSelectedDecks(data.deckCount);
+      setDealerHitsSoft17(data.dealerHitsSoft17);
+      setShowOptions(true); // Move this here after loading
+    });
+};
 
 function handleLoadGame() {
   fetch('/load-game', {
@@ -647,20 +663,24 @@ return (
   <h1>BlackJack</h1>
 
   {bettingPhase && !gameStarted && (
-    <button className="top-left-options-button" onClick={() => setShowOptions(true)}>
+    <button className="top-left-options-button" onClick={openOptions}>
       Options
     </button>
       )}
 
   {!gameStarted && !bettingPhase && (
     <div className="start-button-container">
-      <img src={logo} alt="Blackjack Logo" className="start-logo" />
-      {(highCashout > 2000 || highMaxMoney > 2000) && (
-  <div className="high-score-text">
-    <div>🏆 Cashout Record: ${highCashout}</div>
-    <div>📈 Max Balance Record: ${highMaxMoney}</div>
-  </div>
-)}
+    <img src={logo} alt="Blackjack Logo" className="start-logo" />
+    {(highCashout > 2000 || highMaxMoney > 2000) && (
+      <div className="high-score-text">
+        {highCashout > 2000 && (
+          <div>🏆 Cashout Record: ${highCashout}</div>
+        )}
+        {highMaxMoney > 2000 && (
+          <div>📈 Max Balance Record: ${highMaxMoney}</div>
+        )}
+      </div>
+    )}
       <button
   onClick={handleReset}
 >
@@ -929,25 +949,26 @@ return (
       )}
 
       {helpPage === 3 && (
-        <>
-          <h2>Dealer Rules & Payouts</h2>
-          <p>
-            After the player has finished, the dealer reveals their hidden card and draws cards until reaching at least 17.
-          </p>
-          <p>
-            If the dealer busts (goes over 21), the player wins. If not, the hand closer to 21 wins.
-          </p>
-          <p>
-            <strong>Payouts:</strong>
-          </p>
-          <ul style={{ textAlign: 'left' }}>
-            <li>Win: 2× your bet</li>
-            <li>Blackjack: 3:2 payout (if you get 21 with your first 2 cards)</li>
-            <li>Push (tie): Bet returned</li>
-            <li>Lose: You lose your bet</li>
-          </ul>
-        </>
-      )}
+  <>
+    <h2>Dealer Rules & Payouts</h2>
+    <p>
+      After the player has finished, the dealer reveals their hidden card and draws cards until reaching at least 17.
+      Depending on the selected game options, the dealer may either <strong>stand</strong> or <strong>hit on a soft 17</strong> (a hand totaling 17 that includes an Ace counted as 11).
+    </p>
+    <p>
+      If the dealer busts (goes over 21), the player wins. If not, the hand closer to 21 wins.
+    </p>
+    <p>
+      <strong>Payouts:</strong>
+    </p>
+    <ul style={{ textAlign: 'left' }}>
+      <li>Win: 2× your bet</li>
+      <li>Blackjack: 3:2 payout (if you get 21 with your first 2 cards)</li>
+      <li>Push (tie): Bet returned</li>
+      <li>Lose: You lose your bet</li>
+    </ul>
+  </>
+)}
 
       <div className="help-nav-buttons">
         {helpPage > 1 && (
@@ -980,15 +1001,24 @@ return (
           <option key={n} value={n}>{n}</option>
         ))}
       </select>
-      <button
-        className="apply-options-button"
-        onClick={() => {
-          applyOptions(selectedDecks);
-          setShowOptions(false);
-        }}
+       <label>Dealer Hits Soft 17:</label>
+      <select
+        value={dealerHitsSoft17 ? "yes" : "no"}
+        onChange={(e) => setDealerHitsSoft17(e.target.value === "yes")}
       >
-        Apply
-      </button>
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+      </select>
+      
+      <button
+  className="apply-options-button"
+  onClick={() => {
+    applyOptions(selectedDecks, dealerHitsSoft17);
+    setShowOptions(false);
+  }}
+>
+  Apply
+</button>
     </div>
   </div>
 )}

@@ -26,10 +26,9 @@
 [X] - Automatically take player back to betting screen after hand
 [X] - Add saving/loading
 [X] - Use more decks (currently uses 1) - default is now 6 decks 
-[ ] - Create settings where player can change things such as # of decks used, if dealer hits on soft 17, etc.
-[ ] - Add surrender option
+[X] - Create settings where player can change things such as # of decks used and if dealer hits on soft 17
 [ ] - Create option for player to take insurance when dealer shows an Ace
-[ ] - Add highscore tracking
+[X] - Add highscore tracking
 
 ### Future Possibilities
 [ ] - Add card animations

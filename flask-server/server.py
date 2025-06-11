@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from game import Game
 from deck import Deck
 from settings import save_settings, load_settings
@@ -232,15 +232,13 @@ def cash_out():
         "highMaxMoney": max(game.max_money, old_max)
     })
 
-@app.route("/get-deck-count", methods=["GET"])
-def get_deck_count():
-    deck_count = load_settings()
-    return jsonify({"deckCount": deck_count})
-
 @app.route("/set-decks/<int:deck_count>", methods=["POST"])
 def set_decks(deck_count):
-    save_settings(deck_count)
+    current = load_settings()
+    dealer_hits_soft_17 = current.get("dealer_hits_soft_17", False)
+    save_settings(deck_count, dealer_hits_soft_17)
     return jsonify({"message": f"Deck count set to {deck_count}."})
+
 
 @app.route("/has-save", methods=["GET"])
 def has_save():
@@ -264,11 +262,30 @@ def get_highscores():
         with open("highscore.json", "r") as f:
             highscores = json.load(f)
             return jsonify({
-                "cashout": highscores.get("cashout", 0),
-                "max_balance": highscores.get("max_balance", 0)
+                "cashout": highscores.get("cashout", 2000),
+                "max_balance": highscores.get("max_balance", 2000)
             })
     except FileNotFoundError:
-        return jsonify({"cashout": 0, "max_balance": 0})
+        return jsonify({"cashout": 2000, "max_balance": 2000})
+    
+    
+@app.route("/set-options", methods=["POST"])
+def set_options():
+    data = request.get_json()
+    deck_count = data.get("deckCount", 6)
+    dealer_hits_soft_17 = data.get("dealerHitsSoft17", False)
+
+    save_settings(deck_count, dealer_hits_soft_17)
+    game.set_rules(deck_count, dealer_hits_soft_17)
+    return jsonify({"message": "Options updated."})
+
+@app.route("/get-options", methods=["GET"])
+def get_options():
+    settings = load_settings()
+    return jsonify({
+        "deckCount": settings.get("deck_count", 6),
+        "dealerHitsSoft17": settings.get("dealer_hits_soft_17", False)
+    })
     
 if __name__ == "__main__":
     app.run(debug=True)
