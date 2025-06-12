@@ -87,25 +87,25 @@ class Game:
     #         self.dealer_turn()
 
     def deal_initial_cards(self):
-        self.player.add_card(self.deck.draw_card())
-        self.dealer.add_card(self.deck.draw_card())
-        self.player.add_card(self.deck.draw_card())
-        self.dealer.add_card(self.deck.draw_card())
+        # self.player.add_card(self.deck.draw_card())
+        # self.dealer.add_card(self.deck.draw_card())
+        # self.player.add_card(self.deck.draw_card())
+        # self.dealer.add_card(self.deck.draw_card())
 
-        # self.player.add_card(Card('10', 'Spades'))
-        # self.player.add_card(Card('6', 'Hearts'))
+        self.player.add_card(Card('A', 'Spades'))
+        self.player.add_card(Card('K', 'Spades'))
 
-        # self.dealer.add_card(Card('A', 'Diamonds'))
-        # self.dealer.add_card(Card('6', 'Clubs'))
+        self.dealer.add_card(Card('K', 'Diamonds'))
+        self.dealer.add_card(Card('Q', 'Clubs'))
 
-        # # Force draw order
-        # self.deck.cards = [
-        #     *self.deck.cards,  # Rest of the deck
-        #     Card('2', 'Spades'),
-        #     Card('3', 'Diamonds'),
-        #     Card('2', 'Clubs'),  # To be drawn by hand 2
-        #     Card('3', 'Spades'),  # To be drawn by hand 1
-        # ]
+        # Force draw order
+        self.deck.cards = [
+            *self.deck.cards,  # Rest of the deck
+            Card('2', 'Spades'),
+            Card('3', 'Diamonds'),
+            Card('2', 'Clubs'),  # To be drawn by hand 2
+            Card('3', 'Spades'),  # To be drawn by hand 1
+        ]
 
     def player_turn(self):
         self.hit = True

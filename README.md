@@ -8,6 +8,14 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 
 ---
 
+## 🖼️ Game Preview
+
+<p align="center">
+  <img src="screen_shot.png" alt="Blackjack Game Screenshot" width="700"/>
+</p>
+
+---
+
 ## 🚀 Features
 
 - ✅ **Play against a dealer** with classic Blackjack rules
