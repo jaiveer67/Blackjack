@@ -7,6 +7,7 @@ class Player:
         self.money = starting_money
         self.current_bet = 0
         self.is_split_hand = False
+        self.insurance_bet = 0
 
     def add_card(self, card):
         self.hand.append(card)

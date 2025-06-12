@@ -50,6 +50,8 @@ function App() {
   const chipValues = [1, 5, 25, 100, 500];
   const audioRef = useRef(null);
   const [isMuted, setIsMuted] = useState(false);
+  const [showInsurance, setShowInsurance] = useState(false);
+  const [insuranceTaken, setInsuranceTaken] = useState(false);
 
 useEffect(() => {
     if (!audioRef.current) {
@@ -194,6 +196,11 @@ setTimeout(() => {
 
 setTimeout(() => {
   setCardsDealt(true);
+  if (data.dealerHand[0].rank === 'A') {
+    setShowInsurance(true);
+  } else {
+    setShowInsurance(false);
+  }
 }, 1500);
 
   setTimeout(() => {
@@ -205,6 +212,7 @@ setTimeout(() => {
     setGameOver(data.gameOver);
     setActiveHand(1);
     setBettingPhase(false);
+    setInsuranceTaken(false);
     if (data.gameOver) {
       setPlayerDisplayValue1(data.playerValue);
       setTurnOver(true);
@@ -257,8 +265,6 @@ const handleHit = () => {
       }
     });
 };
-
-
 
 const handleStand = () => {
   if (!isSplit || activeHand === 2) {
@@ -658,6 +664,20 @@ function handleLoadGame() {
     });
 }
 
+const handleInsurance = (takeInsurance) => {
+  setShowInsurance(false);
+  setInsuranceTaken(true);
+
+  if (takeInsurance) {
+    fetch("/take-insurance", { method: "POST" })
+      .then(res => res.json())
+      .then(data => {
+        setPlayerMoney(data.playerMoney);
+      });
+  }
+};
+
+
 return (
   <div className="App">
   <h1>BlackJack</h1>
@@ -868,6 +888,18 @@ return (
     Split
   </button>
 </div>
+
+{showInsurance && !insuranceTaken && (
+  <div className="insurance-modal-overlay">
+    <div className="insurance-modal-content">
+      <p className="insurance-text">The dealer is showing an Ace. Take insurance?</p>
+      <div className="insurance-buttons">
+        <button onClick={() => handleInsurance(true)}>Yes</button>
+        <button onClick={() => handleInsurance(false)}>No</button>
+      </div>
+    </div>
+  </div>
+)}
 
     {/* {gameOver && turnOver && (
       <div className="play-again-button-container">

@@ -83,6 +83,17 @@ def stand():
 
     results = []
 
+    insurance_result = None
+    if game.player.insurance_bet > 0:
+        if game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2:
+            # Dealer has Blackjack, insurance pays 2:1
+            game.player.money += game.player.insurance_bet * 3
+            insurance_result = "Dealer has Blackjack. Insurance pays 2:1!"
+        else:
+            insurance_result = "Dealer does not have Blackjack. Insurance lost."
+        game.player.insurance_bet = 0
+
+
     def evaluate_hand(player, hand_label=None, bet_amount=None):
         prefix = f"{hand_label}: " if hand_label else ""
         bet = bet_amount or player.current_bet
@@ -136,7 +147,8 @@ def stand():
         'dealerValue': game.dealer.hand_value(),
         'gameOver': True,
         'results': results,
-        'playerMoney': game.player.money
+        'playerMoney': game.player.money,
+        'insuranceResult': insurance_result
     })
 
 @app.route("/double/<int:hand_number>", methods=["POST"])
@@ -286,6 +298,19 @@ def get_options():
         "deckCount": settings.get("deck_count", 6),
         "dealerHitsSoft17": settings.get("dealer_hits_soft_17", False)
     })
+
+@app.route("/take-insurance", methods=["POST"])
+def take_insurance():
+    if game.dealer.hand and game.dealer.hand[0].rank == "A":
+        insurance_amount = game.player.current_bet // 2
+        if game.player.money >= insurance_amount:
+            game.player.money -= insurance_amount
+            game.player.insurance_bet = insurance_amount
+            return jsonify({
+                "playerMoney": game.player.money,
+                "insuranceBet": insurance_amount
+            })
+    return jsonify({"error": "Insurance not available"}), 400
     
 if __name__ == "__main__":
     app.run(debug=True)
