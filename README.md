@@ -28,6 +28,7 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
   - **Double** – double your bet, receive one card, and end your turn
   - **Split** - split your hand into 2 if you have a pair
   - **Rebet** – repeat your last bet with a single click
+  - **Insurance** – if the dealer shows an Ace, you can place a side bet to protect against a dealer Blackjack
   - **Cash Out** – view your session summary including final money, max money reached, hands won, and net earnings
   - **Mute/Unmute** – toggle background music and sound effects
 
@@ -44,6 +45,7 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 - Tracks hands won and highest money reached
 - Highest balance reached (max money)
 - Highest cashout value
+- Insurance bets reflected in session money
 📉 Bankruptcy screen when money hits $0
 
 - ⚙️ **Custom Game Options**:
@@ -70,6 +72,7 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 - Double and Split actions require sufficient funds.
 - Cards are dealt one at a time with visual and audio feedback.
 - Game options (deck count & dealer rules) are saved between sessions.
+- Insurance is offered when the dealer shows an Ace, and the player has enough money. If the dealer has Blackjack, the insurance bet pays 2:1. Otherwise, it’s lost.
 
 ---
 
