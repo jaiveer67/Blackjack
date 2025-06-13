@@ -95,7 +95,7 @@ class Game:
         self.player.add_card(Card('7', 'Spades'))
         self.player.add_card(Card('K', 'Spades'))
 
-        self.dealer.add_card(Card('Q', 'Diamonds'))
+        self.dealer.add_card(Card('A', 'Diamonds'))
         self.dealer.add_card(Card('K', 'Clubs'))
 
         # Force draw order

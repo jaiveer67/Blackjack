@@ -1,34 +1,7 @@
 ### Current
 
-[X] - Create function to deal with player blackjack (currently still gives player option to hit)
-[X] - Fix player being asked to hit on 21
-[X] - Give player option to play again
-[X] - Keep track of player wins and dealer wins 
-[X] - Allow player to see dealer's first card when choosing to hit/stand
-[X] - Create option to double in addition to hit/stand
-[X] - Dealer doesn't keep drawing cards after player busts
-[X] - Develop a front end for the game
-[X] - Add split option
-[X] - Add money so player is actually wagering instead of just counting wins/losses
-[X] - Add music/sound effects (could add some more though)
-[X] - Create cash out button with summary of game 
-[X] - Create bankrupcy (lose condition)
-[X] - Automatically reset bet amount to previous bet, unless player money is < previous amount
-[X] - Change buttons to chips 
 [ ] - Make sure display is consistent across platforms and devices
-[X] - Have only one card revealed at a time
-[X] - Include help button with game instructions and rules
-[X] - Total money in corner and wagered amount in middle
-[X] - End music on bankrupt
-[X] - If player doesn't have enough money, make those chip buttons disappear
 [ ] - Swap player hand to bottom and dealer hand to top
-[X] - Make it so hands with A show both possible hand values (e.g 4/14 instead of just 14)
-[X] - Automatically take player back to betting screen after hand
-[X] - Add saving/loading
-[X] - Use more decks (currently uses 1) - default is now 6 decks 
-[X] - Create settings where player can change things such as # of decks used and if dealer hits on soft 17
-[ ] - Create option for player to take insurance when dealer shows an Ace
-[X] - Add highscore tracking
 
 ### Future Possibilities
 [ ] - Add card animations
@@ -40,5 +13,5 @@
 [ ] - Add menu
 [ ] - Incorporate the ability to play multiple hands at once
 [ ] - Create side bets
-[ ] - Clean up code (indentations, refactoring, variable naming, unused functions, etc.)
+[ ] - Clean up code
 [ ] - Maybe create hand limit? (e.g play for 100 hands)

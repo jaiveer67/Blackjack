@@ -196,7 +196,10 @@ setTimeout(() => {
 
 setTimeout(() => {
   setCardsDealt(true);
-  if (data.dealerHand[0].rank === 'A') {
+  console.log(playerMoney)
+  console.log(currentBet)
+  console.log(baseBet)
+  if ((data.dealerHand[0].rank === 'A') && ((playerMoney-currentBet) > (currentBet/2))) {
     setShowInsurance(true);
   } else {
     setShowInsurance(false);
@@ -1002,11 +1005,30 @@ return (
   </>
 )}
 
+{helpPage === 4 && (
+  <>
+    <h2>Insurance</h2>
+    <p>
+      If the dealer’s face-up card is an Ace, you’ll be offered the option to take <strong>Insurance</strong>.
+    </p>
+    <p>
+      Insurance is a side bet that costs half your original bet. It pays 2:1 if the dealer has a Blackjack.
+      This way, you can break even even if the dealer wins.
+    </p>
+    <p>
+      If the dealer does <strong>not</strong> have Blackjack, you lose the insurance bet and the round continues as normal.
+    </p>
+    <p>
+      You can choose <strong>Yes</strong> to take Insurance, or <strong>No</strong> to skip it.
+    </p>
+  </>
+)}
+
       <div className="help-nav-buttons">
         {helpPage > 1 && (
           <button onClick={() => setHelpPage(helpPage - 1)}>Back</button>
         )}
-        {helpPage < 3 && (
+        {helpPage < 4 && (
           <button onClick={() => setHelpPage(helpPage + 1)}>Next</button>
         )}
       </div>
