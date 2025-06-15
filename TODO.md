@@ -1,7 +1,7 @@
 ### Current
 
 [ ] - Make sure display is consistent across platforms and devices
-[ ] - Clean up code
+[ ] - Clean up code / make web version faster (currently too much delay and lag)
 
 ### Future Possibilities
 [ ] - Add card animations

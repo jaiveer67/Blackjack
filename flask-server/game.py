@@ -93,11 +93,11 @@ class Game:
         self.player.add_card(self.deck.draw_card())
         self.dealer.add_card(self.deck.draw_card())
 
-        # self.player.add_card(Card('6', 'Spades'))
-        # self.player.add_card(Card('6', 'Spades'))
+        # self.player.add_card(Card('A', 'Spades'))
+        # self.player.add_card(Card('K', 'Spades'))
 
         # self.dealer.add_card(Card('A', 'Diamonds'))
-        # self.dealer.add_card(Card('8', 'Clubs'))
+        # self.dealer.add_card(Card('K', 'Clubs'))
 
         # # Force draw order
         # self.deck.cards = [

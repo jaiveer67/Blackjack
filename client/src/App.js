@@ -165,6 +165,7 @@ const handleDeal = () => {
     .then(res => res.json())
     .then(data => {
   setPlayerValue1(data.playerValue);
+  setPlayerDisplayValue1(data.playerDisplayValue);
   setGameOver(data.gameOver);
   setPlayerMoney(data.playerMoney);
   setGameStarted(true);
@@ -203,18 +204,14 @@ setTimeout(() => {
     setShowInsurance(false);
   }
 }, 1500);
-console.log(data);
   setTimeout(() => {
     setPlayerMoney(data.playerMoney);
-    setPlayerDisplayValue1(data.playerValue);
+    setPlayerDisplayValue1(data.playerDisplayValue);
     setDealerValue(data.dealerValue);
     setResultMessages(data.result || []);
     setActiveHand(1);
     setBettingPhase(false);
     if (data.gameOver && data.playerHand.length === 2 && data.playerValue === 21 && !(data.dealerHand[0].rank === 'A')) {
-    setPlayerDisplayValue1(data.playerValue);
-    console.log(playerDisplayValue1);
-    console.log(playerValue1);
     setTurnOver(true);
     playSound(blackjackSound);
     handleStand();
@@ -269,9 +266,10 @@ const handleHit = () => {
 };
 
 const handleStand = () => {
-  console.log(`${playerValue1}`)
-  if (!isSplit || activeHand === 2) {
+  if ((!isSplit || activeHand === 2)) {
+    if (playerValue1 !== 21) {
     setPlayerDisplayValue1(`${playerValue1}`);
+    }
     setTurnOver(true);
 
     fetch("/stand")
