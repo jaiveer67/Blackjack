@@ -1,7 +1,7 @@
 ### Current
 
 [ ] - Make sure display is consistent across platforms and devices
-[ ] - Swap player hand to bottom and dealer hand to top
+[ ] - Clean up code
 
 ### Future Possibilities
 [ ] - Add card animations
@@ -13,5 +13,4 @@
 [ ] - Add menu
 [ ] - Incorporate the ability to play multiple hands at once
 [ ] - Create side bets
-[ ] - Clean up code
 [ ] - Maybe create hand limit? (e.g play for 100 hands)

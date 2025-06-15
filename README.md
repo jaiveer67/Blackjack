@@ -73,7 +73,6 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 - Cards are dealt one at a time with visual and audio feedback.
 - Game options (deck count & dealer rules) are saved between sessions.
 - Insurance is offered when the dealer shows an Ace, and the player has enough money. If the dealer has Blackjack, the insurance bet pays 2:1. Otherwise, it’s lost.
-
 ---
 
 ## 🛠 Setup Instructions
