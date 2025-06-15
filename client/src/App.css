@@ -204,6 +204,7 @@ button:not(:disabled):hover {
 .dealer-section {
   text-align: center;
   margin-top: 30px;
+  margin-bottom: -50px;
 }
 
 .hand-row {

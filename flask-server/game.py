@@ -35,6 +35,7 @@ class Game:
     def reset_round(self):
         self.max_money = max(self.max_money, self.player.money)
         self.split_player = None
+        self.player.insurance_bet = 0
         settings = load_settings()
         self.deck = Deck(num_decks=settings.get("deck_count", 6))
         self.dealer_hits_soft_17 = settings.get("dealer_hits_soft_17", False)
@@ -87,25 +88,25 @@ class Game:
     #         self.dealer_turn()
 
     def deal_initial_cards(self):
-        # self.player.add_card(self.deck.draw_card())
-        # self.dealer.add_card(self.deck.draw_card())
-        # self.player.add_card(self.deck.draw_card())
-        # self.dealer.add_card(self.deck.draw_card())
+        self.player.add_card(self.deck.draw_card())
+        self.dealer.add_card(self.deck.draw_card())
+        self.player.add_card(self.deck.draw_card())
+        self.dealer.add_card(self.deck.draw_card())
 
-        self.player.add_card(Card('7', 'Spades'))
-        self.player.add_card(Card('K', 'Spades'))
+        # self.player.add_card(Card('6', 'Spades'))
+        # self.player.add_card(Card('6', 'Spades'))
 
-        self.dealer.add_card(Card('A', 'Diamonds'))
-        self.dealer.add_card(Card('K', 'Clubs'))
+        # self.dealer.add_card(Card('A', 'Diamonds'))
+        # self.dealer.add_card(Card('8', 'Clubs'))
 
-        # Force draw order
-        self.deck.cards = [
-            *self.deck.cards,  # Rest of the deck
-            Card('2', 'Spades'),
-            Card('3', 'Diamonds'),
-            Card('2', 'Clubs'),  # To be drawn by hand 2
-            Card('3', 'Spades'),  # To be drawn by hand 1
-        ]
+        # # Force draw order
+        # self.deck.cards = [
+        #     *self.deck.cards,  # Rest of the deck
+        #     Card('2', 'Spades'),
+        #     Card('4', 'Diamonds'),
+        #     Card('7', 'Clubs'),  # To be drawn by hand 2
+        #     Card('6', 'Spades'),  # To be drawn by hand 1
+        # ]
 
     def player_turn(self):
         self.hit = True
@@ -180,7 +181,7 @@ class Game:
     #         return {'error': 'Not enough money to double'}, 400
         
     def split(self):
-        if len(self.player.hand) == 2 and self.player.hand[0].value == self.player.hand[1].value:
+        if len(self.player.hand) == 2 and self.player.hand[0].rank == self.player.hand[1].rank:
             if self.player.money < self.player.current_bet:
                 raise ValueError("Insufficient funds to split.")
             
