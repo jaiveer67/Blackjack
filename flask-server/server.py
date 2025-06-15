@@ -1,11 +1,11 @@
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from game import Game
 from deck import Deck
 from settings import save_settings, load_settings
 from save import save_game_state, load_game_state, save_highscores, load_highscores
 import os, json
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="client-build", static_url_path="")
 
 game = Game()
 SAVE_FILE = "savegame.json"
@@ -339,6 +339,14 @@ def take_insurance():
 def check_dealer_blackjack():
     dealer_value = game.dealer.hand_value()
     return jsonify({ "dealerValue": dealer_value })
+
+@app.route("/")
+def serve_index():
+    return send_from_directory(app.static_folder, "index.html")
+
+@app.errorhandler(404)
+def not_found(e):
+    return send_from_directory(app.static_folder, "index.html")
     
 if __name__ == "__main__":
     app.run(debug=True)
