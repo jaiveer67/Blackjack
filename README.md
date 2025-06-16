@@ -16,6 +16,14 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 
 ---
 
+## 🎮 Play the Game
+You can try the game live here:
+🔗 https://blackjack-app-g8kl.onrender.com
+
+⚠️ Note: This hosted version may feel a bit slower than running it locally. This is due to server latency and cold starts on the free hosting tier. For the best experience, clone the repo and run it locally using the instructions below.
+
+---
+
 ## 🚀 Features
 
 - ✅ **Play against a dealer** with classic Blackjack rules
