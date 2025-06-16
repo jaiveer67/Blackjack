@@ -266,18 +266,16 @@ const handleHit = () => {
 };
 
 const handleStand = () => {
-  if ((!isSplit || activeHand === 2)) {
-    if (playerValue1 !== 21) {
-    setPlayerDisplayValue1(`${playerValue1}`);
-    }
-    setTurnOver(true);
+ if ((!isSplit || activeHand === 2)) {
+  setTurnOver(true);
 
-    fetch("/stand")
-      .then(res => res.json())
-      .then(data => {
-        graduallyRevealDealerCards(data);
-      });
-  } else if (isSplit && activeHand === 1) {
+  fetch("/stand")
+    .then(res => res.json())
+    .then(data => {
+      setPlayerDisplayValue1(data.playerValue);
+      graduallyRevealDealerCards(data);
+    });
+} else if (isSplit && activeHand === 1) {
     // Switch to second hand
     setTurnOver(true);
     setTimeout(() => {
@@ -286,82 +284,85 @@ const handleStand = () => {
     }, 500);
   }
 
-  const graduallyRevealDealerCards = (data) => {
-    const totalCards = data.dealerHand.length;
+const graduallyRevealDealerCards = (data) => {
+  const totalCards = data.dealerHand.length;
+  const playerBlackjack = data.playerBlackjack;
 
-    setTimeout(() => {
-      setDealerHand(data.dealerHand);
-      setRevealedDealerCardsCount(2);
-      setDealerValue(calculateHandValue(data.dealerHand.slice(0, 2)));
-      playSound(cardSound);
+  // Always show first 2 dealer cards after delay
+  setTimeout(() => {
+    setDealerHand(data.dealerHand);
+    setRevealedDealerCardsCount(2);
+    setDealerValue(calculateHandValue(data.dealerHand.slice(0, 2)));
+    playSound(cardSound);
 
-      if (totalCards === 2) {
+    // ✅ Exit early if dealer only has 2 cards or player had blackjack
+    if (totalCards === 2 || playerBlackjack) {
+      setTimeout(() => {
+        setResultMessages(data.results || []);
+        setGameOver(true);
+        setTurnOver(true);
+        setPlayerMoney(data.playerMoney);
+
+        if (data.playerMoney > highMaxMoney) {
+          setHighMaxMoney(data.playerMoney);
+          setShowMaxBalanceBanner(true);
+          setTimeout(() => setShowMaxBalanceBanner(false), 3000);
+        }
+
+        if (data.playerMoney <= 0) {
+          setIsBankrupt(true);
+          setIsMuted(true);
+          handleCashOut();
+        }
+
         setTimeout(() => {
-          setResultMessages(data.results || []);
-          setGameOver(true);
-          setTurnOver(true);
-          setPlayerMoney(data.playerMoney);
+          handlePlayAgain();
+        }, 2000);
+      }, 400);
+    } else {
+      let i = 2;
+      const interval = setInterval(() => {
+        i++;
+        if (i > totalCards) {
+          clearInterval(interval);
+          return;
+        }
 
-          if (data.playerMoney > highMaxMoney) {
-            setHighMaxMoney(data.playerMoney);
-            setShowMaxBalanceBanner(true);
-            setTimeout(() => setShowMaxBalanceBanner(false), 3000); // hide after 3s
-          }
+        const visibleCards = data.dealerHand.slice(0, i);
+        setRevealedDealerCardsCount(i);
+        setDealerValue(calculateHandValue(visibleCards));
+        playSound(cardSound);
 
-          if (data.playerMoney <= 0) {
-            setIsBankrupt(true);
-            setIsMuted(true);
-            handleCashOut();
-          }
-
+        if (i === totalCards) {
+          clearInterval(interval);
           setTimeout(() => {
-            handlePlayAgain();
-          }, 2000);
-        }, 400);
-      }
-    }, 400);
+            setResultMessages(data.results || []);
+            setGameOver(true);
+            setTurnOver(true);
+            setPlayerMoney(data.playerMoney);
 
-    let i = 2;
-    const interval = setInterval(() => {
-      i++;
-      if (i > totalCards) {
-        clearInterval(interval);
-        return;
-      }
+            if (data.playerMoney > highMaxMoney) {
+              setHighMaxMoney(data.playerMoney);
+              setShowMaxBalanceBanner(true);
+              setTimeout(() => setShowMaxBalanceBanner(false), 3000);
+            }
 
-      const visibleCards = data.dealerHand.slice(0, i);
-      setRevealedDealerCardsCount(i);
-      setDealerValue(calculateHandValue(visibleCards));
-      playSound(cardSound);
+            if (data.playerMoney <= 0) {
+              setIsBankrupt(true);
+              setIsMuted(true);
+              handleCashOut();
+            }
 
-      if (i === totalCards) {
-        clearInterval(interval);
-        setTimeout(() => {
-          setResultMessages(data.results || []);
-          setGameOver(true);
-          setTurnOver(true);
-          setPlayerMoney(data.playerMoney);
+            setTimeout(() => {
+              handlePlayAgain();
+            }, 2000);
+          }, 600);
+        }
+      }, 1000);
+    }
+  }, 400);
+};
 
-          if (data.playerMoney > highMaxMoney) {
-            setHighMaxMoney(data.playerMoney);
-            setShowMaxBalanceBanner(true);
-            setTimeout(() => setShowMaxBalanceBanner(false), 3000); // hide after 3s
-          }
-
-
-          if (data.playerMoney <= 0) {
-            setIsBankrupt(true);
-            setIsMuted(true);
-            handleCashOut();
-          }
-
-          setTimeout(() => {
-            handlePlayAgain();
-          }, 2000);
-        }, 600);
-      }
-    }, 1000);
-  };
 };
 
 const handleDouble = () => {

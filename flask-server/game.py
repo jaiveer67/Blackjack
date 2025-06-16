@@ -96,16 +96,16 @@ class Game:
         # self.player.add_card(Card('A', 'Spades'))
         # self.player.add_card(Card('K', 'Spades'))
 
-        # self.dealer.add_card(Card('A', 'Diamonds'))
-        # self.dealer.add_card(Card('K', 'Clubs'))
+        # self.dealer.add_card(Card('10', 'Diamonds'))
+        # self.dealer.add_card(Card('2', 'Clubs'))
 
         # # Force draw order
         # self.deck.cards = [
         #     *self.deck.cards,  # Rest of the deck
         #     Card('2', 'Spades'),
-        #     Card('4', 'Diamonds'),
+        #     Card('A', 'Diamonds'),
         #     Card('7', 'Clubs'),  # To be drawn by hand 2
-        #     Card('6', 'Spades'),  # To be drawn by hand 1
+        #     Card('8', 'Spades'),  # To be drawn by hand 1
         # ]
 
     def player_turn(self):

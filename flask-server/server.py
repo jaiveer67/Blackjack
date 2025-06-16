@@ -13,13 +13,6 @@ SAVE_FILE = "savegame.json"
 @app.route("/start", methods=["GET"])
 def start():
     game.reset_round()
-
-    # if game.player.money >= game.last_bet:
-    #     game.player.current_bet = game.last_bet
-    # else:
-    #     game.player.current_bet = 0
-    #     game.last_bet = 0
-
     result = []
     game_over = False
     display_value = 0
@@ -91,7 +84,14 @@ def hit_split(hand_number):
 
 @app.route("/stand", methods=['GET'])
 def stand():
-    if not game.player.is_bust():
+
+    is_blackjack = (
+        len(game.player.hand) == 2 and 
+        game.player.hand_value() == 21 and 
+        not game.player.is_split_hand
+    )
+
+    if not is_blackjack and not game.player.is_bust():
         game.dealer_turn()
 
     results = []
@@ -107,11 +107,10 @@ def stand():
 
         dealer_blackjack = game.dealer.hand_value() == 21 and len(game.dealer.hand) == 2
         insurance_taken = player.insurance_bet > 0
-        print(insurance_taken)
         # Handle insurance if taken
         if insurance_taken:
             if dealer_blackjack:
-                game.player.money += player.insurance_bet * 3  # pays 2:1
+                game.player.money += player.insurance_bet * 3
                 insurance_message = " Insurance paid out!"
             else:
                 insurance_message = " Insurance lost."
@@ -124,10 +123,6 @@ def stand():
             return f"{prefix}You busted! Dealer wins.{insurance_message}"
         elif dealer_blackjack and not is_initial_blackjack:
             return f"{prefix}Dealer Blackjack. You lose.{insurance_message}"
-        elif game.dealer.is_bust():
-            game.player.money += bet * 2
-            game.hands_won += 1
-            return f"{prefix}Dealer busted! You win!{insurance_message}"
         elif is_initial_blackjack:
             if dealer_blackjack:
                 game.player.money += bet  # push
@@ -136,6 +131,10 @@ def stand():
                 game.player.money += bet * 2.5
                 game.hands_won += 1
                 return f"{prefix}BLACKJACK! YOU WIN!{insurance_message}"
+        elif game.dealer.is_bust():
+            game.player.money += bet * 2
+            game.hands_won += 1
+            return f"{prefix}Dealer busted! You win!{insurance_message}"
         elif player.hand_value() > game.dealer.hand_value():
             game.player.money += bet * 2
             game.hands_won += 1
@@ -170,7 +169,9 @@ def stand():
         'dealerValue': game.dealer.hand_value(),
         'gameOver': True,
         'results': results,
-        'playerMoney': game.player.money
+        'playerMoney': game.player.money,
+        'playerValue': game.player_value(),
+        "playerBlackjack": is_blackjack
     })
 
 

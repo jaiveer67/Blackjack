@@ -2,7 +2,8 @@
 
 [ ] - Make sure display is consistent across platforms and devices
 [ ] - Clean up code / make web version faster (currently too much delay and lag)
-
+[ ] - Save into db so each player has different save
+ 
 ### Future Possibilities
 [ ] - Add card animations
 [ ] - Include how much player won in result message
