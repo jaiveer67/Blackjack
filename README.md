@@ -1,4 +1,4 @@
-# 🃏 Blackjack Game
+# 🃏 BlackJack Game
 
 ## 🎮 Introduction
 
@@ -16,42 +16,61 @@ Your goal is simple: **get as close to 21 as possible** without going over, and 
 
 ---
 
+## 🎮 Play the Game
+You can try the game live here:
+🔗 https://blackjack-app-g8kl.onrender.com
+
+⚠️ Note: This hosted version may feel a bit slower than running it locally. This is due to server latency and cold starts on the free hosting tier. For the best experience, clone the repo and run it locally using the instructions below.
+
+---
+
 ## 🚀 Features
 
-- ✅ **Play against a dealer** with classic Blackjack rules
-- 🃏 **Face-down dealer card** until the player ends their turn
-- 🧠 **Game logic handled in Python** with deck, player, and dealer management
-- 🎨 **React frontend** dynamically renders cards and scores
-- 👇 Interactive controls for:
-  - **Hit** – take another card
-  - **Stand** – end your turn and let the dealer play
-  - **Double** – double your bet, receive one card, and end your turn
-  - **Split** - split your hand into 2 if you have a pair
-  - **Rebet** – repeat your last bet with a single click
-  - **Insurance** – if the dealer shows an Ace, you can place a side bet to protect against a dealer Blackjack
-  - **Cash Out** – view your session summary including final money, max money reached, hands won, and net earnings
-  - **Mute/Unmute** – toggle background music and sound effects
+### 🎮 Core Gameplay
+- ✅ **Play against a dealer** with classic Blackjack rules  
+- 🃏 **Face-down dealer card** until the player ends their turn  
+- 🧠 **Game logic in Python** managing deck, player, and dealer behavior  
+- 🎨 **React frontend** dynamically renders cards and scores  
 
+---
 
-🔊 Audio effects for card dealing and blackjack  
-♠️ ♥️ Visual card graphics with animated dealing one card at a time  
-🔄 Stateful gameplay with:
-- Automatic bust detection  
-- Blackjack vs. 21 distinction after splits  
-- Split hands managed independently with separate results  
-📈 Persistent Session tracking:
-- Starting money ($2000)
-- Bet management and chip selection
-- Tracks hands won and highest money reached
-- Highest balance reached (max money)
-- Highest cashout value
-- Insurance bets reflected in session money
-📉 Bankruptcy screen when money hits $0
+### 🎛️ Interactive Controls
+- **Hit** – take another card  
+- **Stand** – end your turn and let the dealer play  
+- **Double** – double your bet, receive one card, and end your turn  
+- **Split** – split your hand into 2 if you have a pair  
+- **Rebet** – repeat your last bet with a single click  
+- **Insurance** – place a side bet if the dealer shows an Ace  
+- **Cash Out** – view final money, max money, hands won, and profit  
+- **Mute/Unmute** – toggle background music and sound effects  
 
-- ⚙️ **Custom Game Options**:
-  - Choose number of decks (1, 2, 4, 6, 8)
-  - Enable/disable **Dealer Hits on Soft 17**
-  - Options persist between games
+---
+
+### 🔄 Game Mechanics
+- 🃏 One-by-one **animated card dealing**  
+- ♠️ ♥️ Visual card graphics and dynamic score updates  
+- Automatic **bust detection** and Blackjack vs. 21 distinction  
+- Split hands handled independently with separate outcomes  
+
+---
+
+### 📈 Session Tracking
+- Starting balance: **$2000**  
+- Chip-based **betting system** with preset denominations  
+- Tracks:
+  - Hands won  
+  - Highest money reached  
+  - Highest cashout  
+  - Insurance bet impact  
+- 💸 Bankruptcy screen appears when funds hit $0  
+
+---
+
+### ⚙️ Custom Game Options
+- Select number of decks: **1, 2, 4, 6, 8**  
+- Toggle: **Dealer Hits on Soft 17**  
+- Settings persist between sessions
+
 
 ---
 
