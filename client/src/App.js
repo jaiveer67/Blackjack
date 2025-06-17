@@ -53,6 +53,15 @@ function App() {
   const [showInsurance, setShowInsurance] = useState(false);
   const [insuranceTaken, setInsuranceTaken] = useState(false);
 
+const usePreloadCards = () => {
+  useEffect(() => {
+    const context = require.context('./assets/cards', false, /\.png$/);
+    context.keys().forEach(context); 
+  }, []);
+};
+
+usePreloadCards();
+
 useEffect(() => {
     if (!audioRef.current) {
       const music = new Audio(backgroundMusic);
