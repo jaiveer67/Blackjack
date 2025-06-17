@@ -56,15 +56,32 @@ function App() {
 const usePreloadCards = () => {
   useEffect(() => {
     const context = require.context('./assets/cards', false, /\.png$/);
-    context.keys().forEach(key => {
-    const src = context(key);
-    const img = new Image();
-    img.src = src; 
-  });
- }, []);
+    context.keys().forEach(context); 
+  }, []);
 };
 
 usePreloadCards();
+
+const sounds = useRef({});
+
+useEffect(() => {
+  sounds.current.card = new Audio(cardSound);
+  sounds.current.chips = new Audio(chipSound);
+  sounds.current.bgm = new Audio(backgroundMusic);
+  sounds.current.bgm.loop = true;
+  sounds.current.bgm.volume = 0.2;
+  sounds.current.blackjack = new Audio(blackjackSound);
+
+  // Optional: warm up the audio engine silently
+  Object.values(sounds.current).forEach(sound => {
+    sound.load(); // force decode now
+  });
+
+  // Start music if allowed
+  sounds.current.bgm.play().catch(() => {
+    console.warn("Autoplay blocked");
+  });
+}, []);
 
 useEffect(() => {
     if (!audioRef.current) {
@@ -141,7 +158,7 @@ useEffect(() => {
 const toggleMute = () => setIsMuted(prev => !prev);
 
 const handleChipClick = (amount) => {
-  playSound(chipSound);
+  playSound("chips");
 
   if (playerMoney >= currentBet + amount) {
     const newBet = currentBet + amount;
@@ -191,22 +208,22 @@ const handleDeal = () => {
   // Deal cards one by one
   setTimeout(() => {
   setPlayerHand1([playerCards[0]]);
-  playSound(cardSound);
+  playSound("card");
 }, 300);
 
 setTimeout(() => {
   setDealerHand([dealerCards[0]]);
-  playSound(cardSound);
+  playSound("card");
 }, 600);
 
 setTimeout(() => {
   setPlayerHand1([playerCards[0], playerCards[1]]);
-  playSound(cardSound);
+  playSound("card");
 }, 900);
 
 setTimeout(() => {
   setDealerHand([dealerCards[0], dealerCards[1]]);
-  playSound(cardSound);
+  playSound("card");
 }, 1200); 
 
 setTimeout(() => {
@@ -226,7 +243,7 @@ setTimeout(() => {
     setBettingPhase(false);
     if (data.gameOver && data.playerHand.length === 2 && data.playerValue === 21 && !(data.dealerHand[0].rank === 'A')) {
     setTurnOver(true);
-    playSound(blackjackSound);
+    playSound("blackjack");
     handleStand();
   } else {
     setPlayerDisplayValue1(data.playerDisplayValue);
@@ -236,7 +253,7 @@ setTimeout(() => {
 };
 
 const handleHit = () => {
-  playSound(cardSound);
+  playSound("card");
 
   if (!isSplit || activeHand === 2) {
     setCanDouble(false);
@@ -306,9 +323,8 @@ const graduallyRevealDealerCards = (data) => {
     setDealerHand(data.dealerHand);
     setRevealedDealerCardsCount(2);
     setDealerValue(calculateHandValue(data.dealerHand.slice(0, 2)));
-    playSound(cardSound);
+    playSound("card");
 
-    // ✅ Exit early if dealer only has 2 cards or player had blackjack
     if (totalCards === 2 || playerBlackjack) {
       setTimeout(() => {
         setResultMessages(data.results || []);
@@ -344,7 +360,7 @@ const graduallyRevealDealerCards = (data) => {
         const visibleCards = data.dealerHand.slice(0, i);
         setRevealedDealerCardsCount(i);
         setDealerValue(calculateHandValue(visibleCards));
-        playSound(cardSound);
+        playSound("card");
 
         if (i === totalCards) {
           clearInterval(interval);
@@ -396,7 +412,7 @@ const handleDouble = () => {
         return;
       }
 
-      playSound(cardSound);
+      playSound("card");
 
       if (activeHand === 1) {
         setPlayerHand1(data.playerHand);
@@ -464,7 +480,7 @@ const handleSplit = () => {
         setPlayerHand1(updatedHand1);
         setPlayerValue1(calculateHandValue(updatedHand1));
         setPlayerDisplayValue1(calculateDisplayValue(updatedHand1));
-        playSound(cardSound);
+        playSound("card");
       }, 600);
 
       setTimeout(() => {
@@ -472,7 +488,7 @@ const handleSplit = () => {
         setPlayerHand2(updatedHand2);
         setPlayerValue2(calculateHandValue(updatedHand2));
         setPlayerDisplayValue2(calculateDisplayValue(updatedHand2));
-        playSound(cardSound);
+        playSound("card");
 
         setTurnOver(false);
         if (calculateHandValue([...hand1, extra1]) !== 21) {
@@ -621,10 +637,12 @@ function calculateDisplayValue(hand) {
   return min !== max ? `${min} / ${max}` : `${min}`;
 }
 
-const playSound = (sound) => {
-  if (isMuted) return;
-  const audio = new Audio(sound);
-  audio.play();
+const playSound = (type) => {
+  if (isMuted || !sounds.current[type]) return;
+
+  const audio = sounds.current[type];
+  audio.currentTime = 0;
+  audio.play().catch(() => {});
 };
 
 function applyOptions(deckCount, dealerHitsSoft17) {
@@ -702,7 +720,7 @@ const continueAfterInsurance = () => {
 
       if (playerHasBlackjack || dealerHasBlackjack) {
         setTurnOver(true);
-        if (playerHasBlackjack) playSound(blackjackSound);
+        if (playerHasBlackjack) playSound("blackjack");
         handleStand();
       }
     });
