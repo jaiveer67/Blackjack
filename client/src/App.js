@@ -56,8 +56,12 @@ function App() {
 const usePreloadCards = () => {
   useEffect(() => {
     const context = require.context('./assets/cards', false, /\.png$/);
-    context.keys().forEach(context); 
-  }, []);
+    context.keys().forEach(key => {
+    const src = context(key);
+    const img = new Image();
+    img.src = src; 
+  });
+ }, []);
 };
 
 usePreloadCards();
