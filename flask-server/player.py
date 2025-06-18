@@ -1,5 +1,3 @@
-# Player and Dealer classes
-
 class Player:
     def __init__(self, name, starting_money=2000):
         self.name = name
@@ -40,29 +38,11 @@ class Player:
         else:
             return str(min_value)
     
-    def has_blackjack(self):
-        if self.hand_value() == 21:
-            print("\nBLACKJACK!")
-            return True
-    
     def is_bust(self):
         return self.hand_value() > 21
     
-    def wants_to_hit(self):
-        print(f"\n{self.name}'s hand: {self.hand}")
-        print(f"Total value: {self.hand_value()}")
-        #return input("Do you want to hit? (y/n) ").lower() == 'y'
-    
-    def wants_to_double(self):
-        print(f"\n{self.name}'s hand: {self.hand}")
-        print(f"Total value: {self.hand_value()}")
-        return input("Do you want to hit/stand/double (h/s/d) ").lower() == 'y'
-    
     def str(self):
         return f"{self.name}: {self.hand} (Value: {self.hand_value()})"
-    
-    def wants_to_play_again(self):
-        return input("Do you want to play again? (y/n) ").lower() == 'y'
     
     def reset_hand(self):
         self.hand = []
@@ -72,17 +52,6 @@ class Player:
             raise ValueError("Bet exceeds available money.")
         self.current_bet = amount
         self.money -= amount
-
-    def win_bet(self, multiplier=2):
-        self.money += self.current_bet * multiplier
-        self.current_bet = 0
-
-    def push_bet(self):
-        self.money += self.current_bet
-        self.current_bet = 0
-
-    def lose_bet(self):
-        self.current_bet = 0
     
 class Dealer(Player):
     def __init__(self, dealer_hits_soft_17=False):

@@ -1,5 +1,5 @@
 import React from 'react';
-import Card from './Card';
+import Card from './card';
 
 const Hand = ({ cards }) => {
   if (cards == null) {

@@ -9,5 +9,3 @@ title and mute button shift to right after pressing deal
 split button shows if youve already split and could technically split again
 
 Dealer hand shows a bit too quickly on player blackjack
-
-soft total on split hand doesnt switch to hard total on stand

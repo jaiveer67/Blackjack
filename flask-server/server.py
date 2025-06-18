@@ -1,6 +1,5 @@
 from flask import Flask, jsonify, request, send_from_directory
 from game import Game
-from deck import Deck
 from settings import save_settings, load_settings
 from save import save_game_state, load_game_state, save_highscores, load_highscores
 import os, json
@@ -39,7 +38,7 @@ def start():
         'playerValue': game.player.hand_value(),
         'playerDisplayValue': display_value,
         'dealerValue': game.dealer.hand[0].value,
-        'gameOver': game_over,
+        'isGameOver': game_over,
         'result': result,
         'playerMoney': game.player.money,
         'currentBet': game.player.current_bet,
@@ -68,7 +67,7 @@ def hit_split(hand_number):
             'playerHand': game.player_hand(),
             'playerValue': game.player_value(),
             'playerDisplayValue': game.player.display_hand_value(),
-            'gameOver': (game.player.is_bust() or game.player_value() == 21),
+            'isGameOver': (game.player.is_bust() or game.player_value() == 21),
             'playerMoney': game.player.money
         })
     elif hand_number == 2 and game.split_player:
@@ -77,14 +76,13 @@ def hit_split(hand_number):
             'playerHand': game.player2_hand(),
             'playerValue': game.player2_value(),
             'playerDisplayValue': game.split_player.display_hand_value(),
-            'gameOver': game.split_player.is_bust(),
+            'isGameOver': game.split_player.is_bust(),
             'playerMoney': game.player.money
         })
     return jsonify({'error': 'Invalid hand number'}), 400
 
 @app.route("/stand", methods=['GET'])
 def stand():
-
     is_blackjack = (
         len(game.player.hand) == 2 and 
         game.player.hand_value() == 21 and 
@@ -125,7 +123,7 @@ def stand():
             return f"{prefix}Dealer Blackjack. You lose.{insurance_message}"
         elif is_initial_blackjack:
             if dealer_blackjack:
-                game.player.money += bet  # push
+                game.player.money += bet 
                 return f"{prefix}Push! Both got Blackjack.{insurance_message}"
             else:
                 game.player.money += bet * 2.5
@@ -162,17 +160,20 @@ def stand():
     if game.player.money <= 0 and os.path.exists(SAVE_FILE):
         os.remove(SAVE_FILE)
 
-    print(game.player.money)
+    response = {
+    'dealerHand': game.dealer_hand(),
+    'dealerValue': game.dealer.hand_value(),
+    'isGameOver': True,
+    'results': results,
+    'playerMoney': game.player.money,
+    'playerValue': game.player_value(),
+    'playerBlackjack': is_blackjack
+    }
 
-    return jsonify({
-        'dealerHand': game.dealer_hand(),
-        'dealerValue': game.dealer.hand_value(),
-        'gameOver': True,
-        'results': results,
-        'playerMoney': game.player.money,
-        'playerValue': game.player_value(),
-        "playerBlackjack": is_blackjack
-    })
+    if game.split_player and game.split_player.hand:
+        response['playerValue2'] = game.split_player.hand_value()
+
+    return jsonify(response)
 
 
 @app.route("/double/<int:hand_number>", methods=["POST"])
@@ -212,26 +213,6 @@ def split():
         'playerValue2': game.player2_value(),
         'playerDisplayValue2': game.split_player.display_hand_value(),
         'playerMoney': game.player.money
-    }) 
-
-@app.route("/gameOver", methods=['GET'])
-def gameOver():
-    # results = []
-    # player_blackjack = game.player.hand_value() == 21
-    # dealer_blackjack = game.dealer.hand_value() == 21
-
-    # if player_blackjack:
-    #     if dealer_blackjack:
-    #         results.append("Push")
-    #         game.player.money += game.player.current_bet
-    #     else:
-    #         results.append("BLACKJACK! YOU WIN!")
-    #         game.hands_won += 1
-    #         game.player.money += int(game.player.current_bet * 2.5)
-
-    return jsonify({
-        'playerMoney': game.player.money,
-        'dealerValue': game.dealer.hand_value(),
     }) 
 
 @app.route("/reset", methods=["POST"])
@@ -274,7 +255,6 @@ def set_decks(deck_count):
     save_settings(deck_count, dealer_hits_soft_17)
     return jsonify({"message": f"Deck count set to {deck_count}."})
 
-
 @app.route("/has-save", methods=["GET"])
 def has_save():
     return jsonify({"hasSave": os.path.exists(SAVE_FILE)})
@@ -285,7 +265,7 @@ def load_game():
         load_game_state(game)
         return jsonify({
             "playerMoney": game.player.money,
-            "gameOver": False,
+            "isGameOver": False,
             "cardsDealt": True,
         })
     except FileNotFoundError:
@@ -302,8 +282,7 @@ def get_highscores():
             })
     except FileNotFoundError:
         return jsonify({"cashout": 2000, "max_balance": 2000})
-    
-    
+       
 @app.route("/set-options", methods=["POST"])
 def set_options():
     data = request.get_json()
