@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { useState, useEffect, useRef } from 'react'
 import './app.css';
-import { getCardValue, calculateHandValue, calculateDisplayValue, toggleMute, playSound } from './utils';
+import { getCardValue, calculateHandValue, calculateDisplayValue, toggleMute, playSound, preloadImages } from './utils';
 import HelpModal from './components/helpModal';
 import OptionsModal from './components/optionsModal';
 import SummaryModal from './components/summaryModal';
@@ -64,17 +64,31 @@ function App() {
   const [insuranceTaken, setInsuranceTaken] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const chipValues = [1, 5, 25, 100, 500];
-
-  const usePreloadCards = () => {
-    useEffect(() => {
-      const context = require.context('./assets/cards', false, /\.png$/);
-      context.keys().forEach(context);
-    }, []);
-  };
-
-  usePreloadCards();
-
   const sounds = useRef({});
+
+  useEffect(() => {
+    const suits = ['clubs', 'diamonds', 'hearts', 'spades'];
+    const ranks = [
+      'A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'
+    ];
+
+    const cardFilenames = [];
+    suits.forEach(suit => {
+      ranks.forEach(rank => {
+        cardFilenames.push(`${rank}_of_${suit}.png`);
+      });
+    });
+    cardFilenames.push('card_back.png');
+
+    const imageUrls = cardFilenames.map(
+      filename =>
+        process.env.PUBLIC_URL
+          ? `${process.env.PUBLIC_URL}/assets/cards/${filename}`
+          : `/assets/cards/${filename}`
+    );
+
+    preloadImages(imageUrls);
+  }, []);
 
   useEffect(() => {
     const localSounds = sounds.current;
@@ -197,7 +211,8 @@ function App() {
       currentBet,
       playSound,
       sounds,
-      isMuted
+      isMuted,
+      handleStand: handleStandWrapper
     });
   };
 

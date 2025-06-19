@@ -18,7 +18,15 @@ const GameControls = ({
 }) => (
   <div
     className="controls"
-    style={{ visibility: gameStarted && cardsDealt && !turnOver ? 'visible' : 'hidden' }}
+    style={{
+      visibility: gameStarted && cardsDealt && !turnOver ? 'visible' : 'hidden',
+      pointerEvents: gameStarted && cardsDealt && !turnOver ? 'auto' : 'none',
+      transition: 'visibility 0.2s',
+      display: 'flex',
+      gap: '8px',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}
   >
     <button onClick={handleHit}>Hit</button>
     <button onClick={handleStand}>Stand</button>

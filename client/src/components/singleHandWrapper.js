@@ -24,11 +24,12 @@ const SingleHandWrapper = ({
       </div>
       <Hand cards={cards} />
     </div>
-    {cardsDealt && (
-  <div className="current-bet-display">
-    Bet: ${bet}
-  </div>
-)}
+    <div
+  className="current-bet-display"
+  style={{ visibility: cardsDealt ? "visible" : "hidden" }}
+>
+  Bet: ${bet}
+</div>
   </div>
 );
 

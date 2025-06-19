@@ -41,7 +41,6 @@ h1 {
 .controls {
   display: flex;
   justify-content: center;
-  gap: 20px;
   margin-top: 20px;
   margin-bottom: 50px;
 }
@@ -304,6 +303,7 @@ button:not(:disabled):hover {
 }
 
 .current-bet-display {
+  margin-top: 20px;
   text-align: center;
   align-items: center;
   font-size: 40px;

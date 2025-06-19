@@ -12,12 +12,15 @@ const PlayerHandWrapper = ({
   cardsDealt,
 }) => (
   <div className="hand-wrapper">
-    <div className="result-message-wrapper">
-      {isGameOver && (
-        <div className="result-message" style={{ visibility: isGameOver ? 'visible' : 'hidden' }}>
-          {resultMessage}
-        </div>
-      )}
+    <div className="result-message-wrapper" style={{ minHeight: "24px" }}>
+      <div
+        className="result-message"
+        style={{
+          visibility: isGameOver && resultMessage ? "visible" : "hidden"
+        }}
+      >
+        {resultMessage || "Placeholder"}
+      </div>
     </div>
     <div className="hand-row">
       <div className="hand-label">
@@ -31,11 +34,12 @@ const PlayerHandWrapper = ({
       </div>
       <Hand cards={cards} />
     </div>
-    {cardsDealt && (
-  <div className="current-bet-display">
-    Bet: ${bet}
-  </div>
-)}
+      <div
+  className="current-bet-display"
+  style={{ visibility: cardsDealt ? "visible" : "hidden" }}
+>
+  Bet: ${bet}
+</div>
   </div>
 );
 

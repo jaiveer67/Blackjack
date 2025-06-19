@@ -61,3 +61,10 @@ export const playSound = (sounds, soundName, isMuted) => {
 };
 
 export const toggleMute = (setIsMuted) => setIsMuted(prev => !prev);
+
+export const preloadImages = (imageUrls) => {
+  imageUrls.forEach((url) => {
+    const img = new window.Image();
+    img.src = url;
+  });
+}

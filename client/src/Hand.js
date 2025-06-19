@@ -3,7 +3,7 @@ import Card from './card';
 
 const Hand = ({ cards }) => {
   if (cards == null) {
-    console.warn("Invalid cards:", cards);  // ← will show you the culprit
+    console.warn("Invalid cards:", cards); 
     return <div className="hand">No cards to display.</div>;
   }
    return (

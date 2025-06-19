@@ -41,6 +41,7 @@ export const handleDeal = ({
   playSound,
   sounds,
   isMuted,
+  handleStand
 }) => {
   setGameStarted(true);
   setBettingPhase(false);
