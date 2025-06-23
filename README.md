@@ -47,8 +47,8 @@ You can try the game live here:
 ---
 
 ### 🔄 Game Mechanics
-- 🃏 One-by-one **animated card dealing**  
-- ♠️ ♥️ Visual card graphics and dynamic score updates  
+- One-by-one **animated card dealing**  
+- Visual card graphics and dynamic score updates  
 - Automatic **bust detection** and Blackjack vs. 21 distinction  
 - Split hands handled independently with separate outcomes  
 
