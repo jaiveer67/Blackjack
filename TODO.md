@@ -1,8 +1,4 @@
 ### Current
-
-[ ] - Make sure display is consistent across platforms and devices
-[ ] - Clean up code / make web version faster (currently too much delay and lag)
-[ ] - Save into db so each player has different save
  
 ### Future Possibilities
 [ ] - Add card animations
@@ -15,3 +11,5 @@
 [ ] - Incorporate the ability to play multiple hands at once
 [ ] - Create side bets
 [ ] - Maybe create hand limit? (e.g play for 100 hands)
+[ ] - Make sure display is consistent across platforms and devices
+[ ] - Save into db so each player has different save
