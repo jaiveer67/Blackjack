@@ -90,6 +90,9 @@ function App() {
     preloadImages(imageUrls);
   }, []);
 
+  console.log("backgroundMusic:", backgroundMusic);
+
+
   useEffect(() => {
     const localSounds = sounds.current;
     localSounds.card = new Audio(cardSound);
@@ -387,6 +390,11 @@ function App() {
   };
 
   const handleResetWrapper = () => {
+    if (sounds.current.bgm && !isMuted) {
+    sounds.current.bgm.play().catch(() => {
+      console.warn("Music play still blocked");
+    });
+  }
     handleReset({
       setPlayerMoney,
       setGameStarted,
