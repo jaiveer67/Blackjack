@@ -1,16 +1,17 @@
 from flask import Flask, jsonify, request, send_from_directory
 from game import Game
 from settings import save_settings, load_settings
-from save import save_game_state, load_game_state, save_highscores, load_highscores
+from save import save_game_state, load_game_state, save_highscores, load_highscores, get_save_file, get_highscore_file, safe_user_id
 import os, json
 
 app = Flask(__name__, static_folder="client-build", static_url_path="")
 
 game = Game()
-SAVE_FILE = "savegame.json"
 
-@app.route("/start", methods=["GET"])
+@app.route("/start", methods=["POST"])
 def start():
+    data = request.get_json()
+    user_id = safe_user_id(data.get("userId"))
     game.reset_round()
     result = []
     game_over = False
@@ -31,6 +32,8 @@ def start():
         display_value = 21
     else:
         display_value = game.player.display_hand_value()
+
+    save_game_state(game, user_id)
 
     return jsonify({
         'playerHand': game.player_hand(),
@@ -81,8 +84,12 @@ def hit_split(hand_number):
         })
     return jsonify({'error': 'Invalid hand number'}), 400
 
-@app.route("/stand", methods=['GET'])
+@app.route("/stand", methods=['POST'])
 def stand():
+    data = request.get_json()
+    user_id = safe_user_id(data.get("userId"))
+    SAVE_FILE = get_save_file(user_id)
+
     is_blackjack = (
         len(game.player.hand) == 2 and 
         game.player.hand_value() == 21 and 
@@ -150,12 +157,12 @@ def stand():
     else:
         results.append(evaluate_hand(game.player))
 
-    save_game_state(game)
+    save_game_state(game, user_id)
 
     game.max_money = max(game.max_money, game.player.money)
-    highscores = load_highscores()
+    highscores = load_highscores(user_id)
     if game.max_money > highscores.get("max_balance", 2000):
-        save_highscores(highscores.get("cashout", 2000), game.max_money)
+        save_highscores(user_id, highscores.get("cashout", 2000), game.max_money)
 
     if game.player.money <= 0 and os.path.exists(SAVE_FILE):
         os.remove(SAVE_FILE)
@@ -221,11 +228,15 @@ def reset():
     game = Game()
     return jsonify({"message": "Game fully reset."})
 
-@app.route("/cashout", methods=["GET"])
+@app.route("/cashout", methods=["POST"])
 def cash_out():
+    data = request.get_json()
+    user_id = safe_user_id(data.get("userId"))
+    SAVE_FILE = get_save_file(user_id)
+
     profit = game.player.money - 2000
     final = game.player.money
-    highscores = load_highscores()
+    highscores = load_highscores(user_id)
     old_cashout = highscores["cashout"]
     old_max = highscores["max_balance"]
 
@@ -233,7 +244,7 @@ def cash_out():
     is_new_max = game.max_money > old_max
 
     if final > 2000:
-        save_highscores(final, game.max_money)
+        save_highscores(user_id, final, game.max_money)
 
     if os.path.exists(SAVE_FILE):
         os.remove(SAVE_FILE)
@@ -255,14 +266,19 @@ def set_decks(deck_count):
     save_settings(deck_count, dealer_hits_soft_17)
     return jsonify({"message": f"Deck count set to {deck_count}."})
 
-@app.route("/has-save", methods=["GET"])
+@app.route("/has-save", methods=["POST"])
 def has_save():
+    data = request.get_json()
+    user_id = safe_user_id(data.get("userId"))
+    SAVE_FILE = get_save_file(user_id)
     return jsonify({"hasSave": os.path.exists(SAVE_FILE)})
 
 @app.route("/load-game", methods=["POST"])
 def load_game():
+    data = request.get_json()
+    user_id = safe_user_id(data.get("userId"))
     try:
-        load_game_state(game)
+        load_game_state(game, user_id)
         return jsonify({
             "playerMoney": game.player.money,
             "isGameOver": False,

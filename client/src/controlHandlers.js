@@ -1,3 +1,5 @@
+const userId = localStorage.getItem("user_id");
+
 export const handleChipClick = (amount, { playSound, sounds, isMuted, playerMoney, currentBet, setCurrentBet }) => {
   playSound(sounds, 'chips', isMuted);
 
@@ -54,7 +56,6 @@ export const handleDeal = ({
   setShowSummary(false);
   setShowMaxBalanceBanner(false);
   setShowCashoutBanner(false);
-
   if (currentBet <= 0 || currentBet > playerMoney) {
     alert("Place a valid bet");
     return;
@@ -74,8 +75,12 @@ export const handleDeal = ({
       return res.json();
     })
     .then(() => {
-      return fetch("/start");
-    })
+       return fetch("/start", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId })
+    });
+  })
     .then(res => res.json())
     .then(data => {
       setPlayerValue1(data.playerValue);
@@ -225,15 +230,19 @@ export const handleStand = ({
     setTurnOver(true);
     setActiveHand(null); // Clear active hand display
 
-    fetch("/stand")
-      .then(res => res.json())
-      .then(data => {
-        setPlayerDisplayValue1(data.playerValue);
-        if (data.playerValue2 !== undefined) {
-          setPlayerDisplayValue2(data.playerValue2);
-        }
-        graduallyRevealDealerCards(data);
-      });
+    fetch("/stand", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
+  .then(res => res.json())
+  .then(data => {
+    setPlayerDisplayValue1(data.playerValue);
+    if (data.playerValue2 !== undefined) {
+      setPlayerDisplayValue2(data.playerValue2);
+    }
+    graduallyRevealDealerCards(data);
+  });
   } else if (isSplit && activeHand === 1) {
     setPlayerDisplayValue1(prev => {
       const parts = prev.split('/');
@@ -567,47 +576,60 @@ export const handleCashOut = ({
   setShowCashoutBanner,
   setHasSave
 }) => {
-  fetch("/cashout")
-    .then(res => res.json())
-    .then(data => {
-      setCashOutSummary(data);
-      setShowSummary(true);
-      setIsMuted(true);
-      setHighCashout(data.highCashout);
-      setHighMaxMoney(data.highMaxMoney);
-      if (data.isNewCashout) {
-        setShowCashoutBanner(true);
-        setTimeout(() => setShowCashoutBanner(false), 3000);
-      }
-      return fetch('/has-save');
-    })
-    .then(res => res.json())
-    .then(data => setHasSave(data.hasSave));
+  fetch("/cashout", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
+  .then(res => res.json())
+  .then(data => {
+    setCashOutSummary(data);
+    setShowSummary(true);
+    setIsMuted(true);
+    setHighCashout(data.highCashout);
+    setHighMaxMoney(data.highMaxMoney);
+    if (data.isNewCashout) {
+      setShowCashoutBanner(true);
+      setTimeout(() => setShowCashoutBanner(false), 3000);
+    }
+    return fetch('/has-save');
+  })
+  .then(res => res.json())
+  .then(data => setHasSave(data.hasSave));
 };
 
 export function handleLoadGame({
   setPlayerMoney,
   setGameStarted,
-  setBettingPhase
+  setBettingPhase,
+  sounds,
+  isMuted
 }) {
   fetch('/load-game', {
-    method: 'POST'
+  method: 'POST',
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
+  .then(res => {
+    if (!res.ok) {
+      throw new Error("No saved game found");
+    }
+    return res.json();
   })
-    .then(res => {
-      if (!res.ok) {
-        throw new Error("No saved game found");
+  .then(data => {
+    setPlayerMoney(data.playerMoney);
+    setGameStarted(false);
+    setBettingPhase(true);
+    if (sounds?.current?.bgm && !isMuted) {
+        sounds.current.bgm.play().catch(() => {
+          console.warn("Autoplay blocked on load");
+        });
       }
-      return res.json();
-    })
-    .then(data => {
-      setPlayerMoney(data.playerMoney);
-      setGameStarted(false);
-      setBettingPhase(true);
-    })
-    .catch((err) => {
-      console.error("Load failed:", err);
-      alert("No saved game found.");
-    });
+  })
+  .catch((err) => {
+    console.error("Load failed:", err);
+    alert("No saved game found.");
+  });
 }
 
 export const handleInsurance = ({

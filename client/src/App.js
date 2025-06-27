@@ -150,11 +150,17 @@ function App() {
       });
   }, []);
 
-  useEffect(() => {
-    fetch("/has-save")
-      .then(res => res.json())
-      .then(data => setHasSave(data.hasSave));
-  }, []);
+useEffect(() => {
+  const userId = localStorage.getItem("user_id");
+  fetch("/has-save", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ userId })
+  })
+    .then(res => res.json())
+    .then(data => setHasSave(data.hasSave));
+}, []);
+
 
   useEffect(() => {
     fetch("/get-highscores")
@@ -172,6 +178,14 @@ function App() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [playerValue1, hitEndedTurn]);
+
+  useEffect(() => {
+  let userId = localStorage.getItem("user_id");
+  if (!userId) {
+    userId = crypto.randomUUID();
+    localStorage.setItem("user_id", userId);
+  }
+}, []);
 
   const handleChipClickWrapper = (amount) => {
     handleChipClick(amount, {
@@ -385,7 +399,9 @@ function App() {
     handleLoadGame({
       setPlayerMoney,
       setGameStarted,
-      setBettingPhase
+      setBettingPhase,
+      sounds: sounds,
+      isMuted,
     });
   };
 
