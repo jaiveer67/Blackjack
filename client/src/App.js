@@ -142,12 +142,19 @@ function App() {
   }, [activeHand, playerValue2, isSplit]);
 
   useEffect(() => {
-    fetch('/get-options')
-      .then(res => res.json())
-      .then(data => {
-        setSelectedDecks(data.deckCount);
-        setDealerHitsSoft17(data.dealerHitsSoft17);
-      });
+    fetch("/get-options", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ userId: localStorage.getItem("userId") })
+})
+  .then(res => res.json())
+  .then(data => {
+    setSelectedDecks(data.deckCount);
+    setDealerHitsSoft17(data.dealerHitsSoft17);
+  });
+
   }, []);
 
 useEffect(() => {
@@ -163,12 +170,19 @@ useEffect(() => {
 
 
   useEffect(() => {
-    fetch("/get-highscores")
-      .then(res => res.json())
-      .then(data => {
-        setHighCashout(data.cashout);
-        setHighMaxMoney(data.max_balance);
-      });
+    fetch("/get-highscores", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ userId: localStorage.getItem("userId") })
+})
+  .then(res => res.json())
+  .then(data => {
+    setHighCashout(data.highCashout);
+    setHighMaxMoney(data.highMaxMoney);
+  });
+
   }, []);
 
   useEffect(() => {

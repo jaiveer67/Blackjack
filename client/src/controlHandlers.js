@@ -69,13 +69,19 @@ export const handleDeal = ({
   setBet1(currentBet);
   setBet2(currentBet); // initially same if not split
 
-  fetch(`/bet/${currentBet}`, { method: "POST" })
-    .then(res => {
-      if (!res.ok) throw new Error("Invalid bet");
-      return res.json();
-    })
-    .then(() => {
-       return fetch("/start", {
+  fetch(`/bet/${currentBet}`, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ userId })
+})
+  .then(res => {
+    if (!res.ok) throw new Error("Invalid bet");
+    return res.json();
+  })
+  .then(() => {
+    return fetch("/start", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId })
@@ -166,7 +172,11 @@ export const handleHit = ({
   }
 
   const endpoint = activeHand === 1 ? "/hit/1" : "/hit/2";
-  fetch(endpoint)
+  fetch(endpoint, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
     .then(response => response.json())
     .then(data => {
       const { playerValue, playerDisplayValue, playerHand, isGameOver } = data;
@@ -369,7 +379,13 @@ export const handleDouble = ({
 
   const endpoint = activeHand === 1 ? "/double/1" : "/double/2";
 
-  fetch(endpoint, { method: "POST" })
+  fetch(endpoint, {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json"
+  },
+  body: JSON.stringify({ userId })
+})
     .then(res => res.json())
     .then(data => {
       if (data.error) {
@@ -443,7 +459,12 @@ export const handleSplit = ({
   setIsSplit(true);
   setBet1(currentBet);
   setBet2(currentBet);
-  fetch("/split")
+  fetch("/split", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
+
     .then(response => response.json())
     .then(data => {
       const hand1 = [data.playerHand1[0]];
@@ -551,7 +572,13 @@ export const handleReset = ({
   setRoundNumber
 }) => {
   setIsGameOver(true);
-  fetch("/reset", { method: "POST" })
+  fetch('/reset', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ key: 'value' })
+})
     .then(res => res.json())
     .then(() => {
       setPlayerMoney(2000);
@@ -642,7 +669,11 @@ export const handleInsurance = ({
   setShowInsurance(false);
   if (take) {
     setInsuranceTaken(true);
-    fetch("/take-insurance", { method: "POST" })
+    fetch("/take-insurance", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
       .then(res => res.json())
       .then(data => {
         setPlayerMoney(data.playerMoney);
@@ -665,7 +696,12 @@ export const handleAfterInsurance = ({
 
   const playerHasBlackjack = playerHand1.length === 2 && playerValue1 === 21;
 
-  fetch("/check-dealer-blackjack")
+  fetch("/check-dealer-blackjack", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
+
     .then(res => res.json())
     .then(data => {
       const dealerHasBlackjack = data.dealerValue === 21;
@@ -696,7 +732,12 @@ export function handleOptions(deckCount, dealerHitsSoft17, setSelectedDecks, set
 }
 
 export const openOptions = (setSelectedDecks, setDealerHitsSoft17, setShowOptions) => {
-  fetch("/get-options")
+  fetch("/get-options", {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ userId })
+})
+
     .then(res => res.json())
     .then(data => {
       setSelectedDecks(data.deckCount);

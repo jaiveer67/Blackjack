@@ -12,4 +12,3 @@
 [ ] - Create side bets
 [ ] - Maybe create hand limit? (e.g play for 100 hands)
 [ ] - Make sure display is consistent across platforms and devices
-[ ] - Save into db so each player has different save
