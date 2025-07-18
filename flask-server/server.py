@@ -9,13 +9,21 @@ games = {}  # Maps user_id to their Game instance
 
 def get_or_load_game(user_id):
     if user_id not in games:
-        game = Game()
+        # Load saved settings first
+        settings = load_settings()
+        deck_count = settings.get("deck_count", 6)
+        dealer_hits_soft_17 = settings.get("dealer_hits_soft_17", False)
+        
+        # Create game using saved settings
+        game = Game(deck_count=deck_count, dealer_hits_soft_17=dealer_hits_soft_17)
+        
         try:
             load_game_state(game, user_id)
         except FileNotFoundError:
             pass
         games[user_id] = game
     return games[user_id]
+
 
 @app.route("/start", methods=["POST"])
 def start():
@@ -248,9 +256,15 @@ def split():
 @app.route("/reset", methods=["POST"])
 def reset():
     data = request.get_json()
-    user_id = safe_user_id(data.get("userId"))
-    game = Game()
-    games[user_id] = game
+    user_id = safe_user_id(data.get("userId")) 
+
+    save_file = get_save_file(user_id)
+    if os.path.exists(save_file):
+        os.remove(save_file)
+
+    if user_id in games:
+        del games[user_id]
+
     return jsonify({"message": "Game fully reset for user."})
 
 @app.route("/cashout", methods=["POST"])
@@ -346,12 +360,10 @@ def set_options():
 
 @app.route("/get-options", methods=["POST"])
 def get_options():
-    data = request.get_json()
-    user_id = safe_user_id(data.get("userId"))
-    game = get_or_load_game(user_id)
+    settings = load_settings()
     return jsonify({
-        "deckCount": game.deck_count,
-        "dealerHitsSoft17": game.dealer_hits_soft_17
+        "deckCount": settings.get("deck_count", 6),
+        "dealerHitsSoft17": settings.get("dealer_hits_soft_17", False)
     })
 
 @app.route("/take-insurance", methods=["POST"])

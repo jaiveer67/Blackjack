@@ -2,6 +2,7 @@
 from deck import Deck
 from player import Player, Dealer
 from settings import load_settings
+from card import Card
 
 player_wins = 0
 dealer_wins = 0
@@ -9,11 +10,14 @@ draws = 0
 hit = False
 
 class Game:
-    def __init__(self):
-        settings = load_settings()
-        self.num_decks = settings.get("deck_count", 6)
-        self.dealer_hits_soft_17 = settings.get("dealer_hits_soft_17", False)
+    def __init__(self, deck_count=None, dealer_hits_soft_17=None):
+        if deck_count is None or dealer_hits_soft_17 is None:
+            settings = load_settings()
+            deck_count = settings.get("deck_count", 6)
+            dealer_hits_soft_17 = settings.get("dealer_hits_soft_17", False)
 
+        self.num_decks = deck_count
+        self.dealer_hits_soft_17 = dealer_hits_soft_17
         self.deck = Deck(num_decks=self.num_decks)
         self.player = Player("Player")
         self.split_player = None
@@ -24,6 +28,7 @@ class Game:
         self.last_bet = 0
 
         self._initialize_game()
+
 
     def _initialize_game(self):
         self.deck.shuffle()
@@ -51,25 +56,25 @@ class Game:
         self.dealer = Dealer(dealer_hits_soft_17=self.dealer_hits_soft_17)
 
     def deal_initial_cards(self):
-        self.player.add_card(self.deck.draw_card())
-        self.dealer.add_card(self.deck.draw_card())
-        self.player.add_card(self.deck.draw_card())
-        self.dealer.add_card(self.deck.draw_card())
+        # self.player.add_card(self.deck.draw_card())
+        # self.dealer.add_card(self.deck.draw_card())
+        # self.player.add_card(self.deck.draw_card())
+        # self.dealer.add_card(self.deck.draw_card())
 
-        # self.player.add_card(Card('7', 'Spades'))
-        # self.player.add_card(Card('7', 'Spades'))
+        self.player.add_card(Card('7', 'Spades'))
+        self.player.add_card(Card('7', 'Spades'))
 
-        # self.dealer.add_card(Card('A', 'Diamonds'))
-        # self.dealer.add_card(Card('6', 'Clubs'))
+        self.dealer.add_card(Card('A', 'Diamonds'))
+        self.dealer.add_card(Card('6', 'Clubs'))
 
-        # # Force draw order
-        # self.deck.cards = [
-        #     *self.deck.cards,  # Rest of the deck
-        #     Card('2', 'Spades'),
-        #     Card('A', 'Diamonds'),
-        #     Card('A', 'Clubs'),  # To be drawn by hand 2
-        #     Card('A', 'Spades'),  # To be drawn by hand 1
-        # ]
+        # Force draw order
+        self.deck.cards = [
+            *self.deck.cards,  # Rest of the deck
+            Card('2', 'Spades'),
+            Card('A', 'Diamonds'),
+            Card('A', 'Clubs'),  # To be drawn by hand 2
+            Card('A', 'Spades'),  # To be drawn by hand 1
+        ]
 
     def player_turn(self):
         self.hit = True

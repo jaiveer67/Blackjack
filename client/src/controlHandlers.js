@@ -577,7 +577,7 @@ export const handleReset = ({
   headers: {
     'Content-Type': 'application/json'
   },
-  body: JSON.stringify({ key: 'value' })
+  body: JSON.stringify({ userId: localStorage.getItem("user_id") })
 })
     .then(res => res.json())
     .then(() => {

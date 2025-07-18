@@ -142,20 +142,23 @@ function App() {
   }, [activeHand, playerValue2, isSplit]);
 
   useEffect(() => {
-    fetch("/get-options", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({ userId: localStorage.getItem("userId") })
-})
-  .then(res => res.json())
-  .then(data => {
-    setSelectedDecks(data.deckCount);
-    setDealerHitsSoft17(data.dealerHitsSoft17);
-  });
+  if (showOptions) {
+    console.log("Options modal opened — fetching options...");
+    fetch('/get-options', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: localStorage.getItem("user_id") }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        console.log("Fetched options:", data);
+        setSelectedDecks(data.deckCount);
+        setDealerHitsSoft17(data.dealerHitsSoft17);
+      })
+      .catch(err => console.error('Failed to load options:', err));
+  }
+}, [showOptions]);
 
-  }, []);
 
 useEffect(() => {
   const userId = localStorage.getItem("user_id");
